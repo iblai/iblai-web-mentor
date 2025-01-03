@@ -1,0 +1,26 @@
+{
+  "name": "@iblai/iblai-web-mentor",
+  "version": "1.0.0",
+  "description": "IBL AI Mentor",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "rollup -c"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@ibl_connection:iblai/iblai-web-mentor.git"
+  },
+  "keywords": [
+    "AI",
+    "Mentor",
+    "Artificial",
+    "Intelligence",
+    "LLM"
+  ],
+  "author": "iblai",
+  "license": "ISC",
+  "devDependencies": {
+    "rollup": "^4.29.1"
+  }
+}
