@@ -104,7 +104,7 @@ class MentorAI extends HTMLElement {
           this.redirectToAuthSPA(true);
         }
       } else if (message?.ready) {
-        isEmbeddedMentorReady = true;
+        this.isEmbeddedMentorReady = true;
         if (this.iblData) {
           this.sendAuthDataToIframe(this.iblData);
         } else {
@@ -122,11 +122,11 @@ class MentorAI extends HTMLElement {
   }
 
   get mentorUrl() {
-    return this.getAttribute("mentorUrl") || "https://mentor.iblai.app";
+    return this.getAttribute("mentorurl") || "https://mentor.iblai.app";
   }
 
   set mentorUrl(value) {
-    this.setAttribute("mentorUrl", value);
+    this.setAttribute("mentorurl", value);
   }
 
   get tenant() {
@@ -181,6 +181,18 @@ class MentorAI extends HTMLElement {
     }
   }
 
+  get redirectToken() {
+    return this.hasAttribute("redirecttoken");
+  }
+
+  set redirectToken(value) {
+    if (value) {
+      this.setAttribute("redirecttoken", "");
+    } else {
+      this.removeAttribute("redirecttoken");
+    }
+  }
+
   static get observedAttributes() {
     return ["mentorUrl", "tenant", "mentor", "isadvanced", "iscontextaware"];
   }
@@ -201,7 +213,7 @@ class MentorAI extends HTMLElement {
         const currentUrl = window.location.href;
         if (currentUrl !== lastUrl) {
           lastUrl = currentUrl;
-          isEmbeddedMentorReady && this.sendHostInfoToIframe();
+          this.isEmbeddedMentorReady && this.sendHostInfoToIframe();
         }
       }, 1000);
     }
@@ -274,9 +286,9 @@ class MentorAI extends HTMLElement {
 
   redirectToAuthSPA(forceLogout) {
     const redirectPath = window.location.pathname + window.location.search;
-    window.location.href = `https://auth.iblai.app/login?redirect-path=${redirectPath}&tenant=gillis${
-      forceLogout ? "&logout=true" : ""
-    }`;
+    window.location.href = `https://auth.iblai.app/login?redirect-path=${redirectPath}&tenant=${
+      this.tenant
+    }${forceLogout ? "&logout=true" : ""}&redirectToken=${this.redirectToken}`;
   }
 
   toggleWidget() {

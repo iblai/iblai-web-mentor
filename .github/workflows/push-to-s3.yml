@@ -1,0 +1,42 @@
+name: Push mentor-ai.js to S3
+
+on:
+  release:
+    types:
+      - created
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          repository: iblai/iblai-web-mentor
+          token: ${{ secrets.GIT_TOKEN }}
+          ref: develop
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - name: NPM run build & sync to s3
+        run: |
+          cd $GITHUB_WORKSPACE
+          npm install
+          npm i -g typescript
+          npm run downloadPubClient https://stg-acilearning-com-dm-static.s3.us-east-1.amazonaws.com/pub_client.min.js
+          npm run build
+          cd dist
+          aws s3 cp mentor-ai.js s3://ibl-web-core-frontend/
+          cp ibl-web-core-frontend.js main.js
+          aws s3 cp main.js s3://ibl-web-core-frontend/sdk/js/
+
+      - name: Latest web-core-frontend versionId
+        id: get-version
+        run: |
+          echo "Latest web-core-frontend version ID is $(aws s3api list-object-versions --bucket ibl-web-core-frontend --prefix sdk/js/main.js --query "Versions[0].VersionId" --output text)"
