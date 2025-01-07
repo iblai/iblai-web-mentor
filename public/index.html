@@ -1,12 +1,20 @@
-<script src="../dist/mentor-ai.js"></script>
-
-<mentor-ai
-  mentorUrl="http://localhost:3002"
-  tenant="axpalpha"
-  mentor="e73bc2e3-32fb-40e9-a0e9-1c12f8520df1"
-  redirectToken="b06438af-4e84-45f7-ba2c-44fdd9241981"
-  isContextAware
-  isAnonymous
-  isAdvanced
-  isContextAware
-></mentor-ai>
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Mentor AI Page</title>
+    <script src="../dist/mentor-ai.js"></script>
+  </head>
+  <body style="height: 100vh">
+    <mentor-ai
+      mentorUrl="http://localhost:3002"
+      authUrl="http://localhost:3000"
+      tenant="axpalpha"
+      mentor="ai-job-scout-assistant"
+      redirectToken="b06438af-4e84-45f7-ba2c-44fdd9241981"
+      isContextAware
+      isAdvanced
+    ></mentor-ai>
+  </body>
+</html>

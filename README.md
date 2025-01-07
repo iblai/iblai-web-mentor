@@ -26,7 +26,7 @@ npm install mentor-ai
 Include the bundled script in your HTML file:
 
 ```bash
-<script src="https://your-s3-bucket-url/mentor-ai.js"></script>
+<script src="https://mentor-ai.s3.us-east-1.amazonaws.com/mentor-ai.js"></script>
 ```
 
 ## Usage
@@ -59,14 +59,15 @@ Include the component directly in your HTML:
 
 ### Attributes
 
-| Attribute      | Description                                                                         | Type    | Default Value            |
-| -------------- | ----------------------------------------------------------------------------------- | ------- | ------------------------ |
-| mentorurl      | URL of the MentorAI platform.                                                       | String  | https://mentor.iblai.app |
-| tenant         | Tenant name for authentication.                                                     | String  | undefined                |
-| mentor         | Mentor name for the chat widget.                                                    | String  | undefined                |
-| isanonymous    | Enables anonymous mode. If set, the component will not require user authentication. | Boolean | false                    |
-| iscontextaware | Enables context-aware functionality to send page information to the iframe.         | Boolean | false                    |
-| isadvanced     | Enables advanced chat features.                                                     | Boolean | false                    |
+| Attribute      | Description                                                                                                                           | Type    | Default Value            |
+| -------------- | ------------------------------------------------------------------------------------------------------------------------------------- | ------- | ------------------------ |
+| mentorurl      | URL of the MentorAI platform.                                                                                                         | String  | https://mentor.iblai.app |
+| tenant         | Tenant name for authentication.                                                                                                       | String  | undefined                |
+| mentor         | Mentor name for the chat widget.                                                                                                      | String  | undefined                |
+| isanonymous    | Enables anonymous mode. If set, the component will not require user authentication. (Ensure this matches the anonymity of the mentor) | Boolean | false                    |
+| iscontextaware | Enables context-aware functionality to send page information to the iframe.                                                           | Boolean | false                    |
+| isadvanced     | Enables advanced chat features.                                                                                                       | Boolean | false                    |
+| authUrl        | URL for authentication.                                                                                                               | String  | https://auth.iblai.app   |
 
 ## Javascript Frameworks
 
@@ -89,6 +90,7 @@ const App = () => {
     <div>
       <mentor-ai
         mentorurl="https://mentor.iblai.app"
+        authUrl="https://auth.iblai.app"
         tenant="your-tenant"
         mentor="mentor-name"
         isanonymous
@@ -115,6 +117,7 @@ Use the component in your template:
 ```html
 <mentor-ai
   mentorurl="https://mentor.iblai.app"
+  authUrl="https://auth.iblai.app"
   tenant="your-tenant"
   mentor="mentor-id"
   isanonymous
@@ -151,6 +154,7 @@ Use the component:
 <template>
   <mentor-ai
     mentorurl="https://mentor.iblai.app"
+    authUrl="https://auth.iblai.app"
     tenant="your-tenant"
     mentor="mentor-id"
     isanonymous

@@ -29,14 +29,11 @@ jobs:
           cd $GITHUB_WORKSPACE
           npm install
           npm i -g typescript
-          npm run downloadPubClient https://stg-acilearning-com-dm-static.s3.us-east-1.amazonaws.com/pub_client.min.js
           npm run build
           cd dist
-          aws s3 cp mentor-ai.js s3://ibl-web-core-frontend/
-          cp ibl-web-core-frontend.js main.js
-          aws s3 cp main.js s3://ibl-web-core-frontend/sdk/js/
+          aws s3 cp mentor-ai.js s3://mentor-ai/
 
-      - name: Latest web-core-frontend versionId
+      - name: Latest iblai-web-mentor versionId
         id: get-version
         run: |
-          echo "Latest web-core-frontend version ID is $(aws s3api list-object-versions --bucket ibl-web-core-frontend --prefix sdk/js/main.js --query "Versions[0].VersionId" --output text)"
+          echo "Latest iblai-web-mentor version ID is $(aws s3api list-object-versions --bucket mentor-ai --query "Versions[0].VersionId" --output text)"
