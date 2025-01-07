@@ -29,6 +29,11 @@ jobs:
       - name: Install dependencies
         run: npm install
 
+      - name: Verify npm token
+        run: npm whoami
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
       # Build the package
       - name: Build the package
         run: npm run build
