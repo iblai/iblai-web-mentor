@@ -15,7 +15,7 @@ jobs:
         with:
           repository: iblai/iblai-web-mentor
           token: ${{ secrets.GIT_TOKEN }}
-          ref: develop
+          ref: main
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
