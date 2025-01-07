@@ -18,7 +18,7 @@ The `MentorAI` web component is a customizable chat widget that can be embedded 
 ### Using npm
 
 ```bash
-npm install mentor-ai
+npm install @iblai/iblai-web-mentor
 ```
 
 ### Direct Usage via S3
@@ -76,7 +76,7 @@ Include the component directly in your HTML:
 Install the package:
 
 ```bash
-npm install mentor-ai
+npm install @iblai/iblai-web-mentor
 ```
 
 Use the component
@@ -109,7 +109,7 @@ export default App;
 Install the package:
 
 ```bash
-npm install mentor-ai
+npm install @iblai/iblai-web-mentor
 ```
 
 Use the component in your template:
@@ -145,7 +145,7 @@ export class AppModule {}
 Install the package:
 
 ```bash
-npm install mentor-ai
+npm install @iblai/iblai-web-mentor
 ```
 
 Use the component:
