@@ -14,7 +14,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: iblai/iblai-web-mentor
-          token: ${{ secrets.GIT_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}
           ref: main
 
       - name: Configure AWS credentials
