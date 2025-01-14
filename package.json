@@ -1,12 +1,17 @@
 {
   "name": "@iblai/iblai-web-mentor",
-  "version": "1.0.0",
+  "version": "0.0.0",
   "type": "module",
   "description": "IBL AI Mentor",
-  "main": "index.js",
+  "main": "dist/iblai-web-mentor.esm.js",
   "publishConfig": {
     "access": "public"
   },
+  "files": [
+    "dist",
+    "mentor-ai.d.ts"
+  ],
+  "types": "mentor-ai.d.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "rollup -c"
@@ -25,8 +30,14 @@
   "author": "iblai",
   "license": "MIT",
   "devDependencies": {
+    "@rollup/plugin-commonjs": "^28.0.2",
     "@rollup/plugin-node-resolve": "^16.0.0",
     "@rollup/plugin-terser": "^0.4.4",
     "rollup": "^4.29.1"
+  },
+  "dependencies": {
+    "@rollup/plugin-babel": "^6.0.4",
+    "rollup-plugin-typescript2": "^0.36.0",
+    "typescript": "^5.7.3"
   }
 }

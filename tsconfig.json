@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "target": "es2016",
+    "module": "ES2020",
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "declaration": true,
+    "typeRoots": ["./node_modules/@types", "./mentor-ai.d.ts"],
+    "strict": true,
+    "skipLibCheck": true
+  },
+  "include": [
+    "src/**/*", // Adjust this path as necessary
+    "mentor-ai.d.ts" // Ensure this is included if it's outside src
+  ]
+}
