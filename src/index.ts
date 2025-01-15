@@ -237,9 +237,25 @@ export default class MentorAI extends HTMLElement {
 
   getCleanBodyContent(): string {
     const bodyClone: HTMLElement = document.body.cloneNode(true) as HTMLElement;
+
+    // Iterate through all iframes in the original document
+    const iframes = document.querySelectorAll("iframe");
+
+    iframes.forEach((iframe, index) => {
+      const clonedIframe = bodyClone.querySelectorAll("iframe")[index];
+      if (iframe.contentDocument && clonedIframe) {
+        const iframeContentClone = iframe.contentDocument.body.cloneNode(true);
+        const iframeDocument =
+          clonedIframe.contentDocument || clonedIframe.contentWindow?.document;
+        if (iframeDocument) {
+          iframeDocument.body.innerHTML = "";
+          iframeDocument.body.appendChild(iframeContentClone);
+        }
+      }
+    });
     const selectorsToRemove: string[] = [
       "script",
-      "no-script",
+      "noscript",
       "style",
       "nav",
       "footer",
