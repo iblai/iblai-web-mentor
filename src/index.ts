@@ -225,11 +225,12 @@ export default class MentorAI extends HTMLElement {
     if (this.isContextAware) {
       this.lastUrl = window.location.href;
       setInterval(() => {
-        const currentUrl = window.location.href;
-        if (currentUrl !== this.lastUrl) {
-          this.lastUrl = currentUrl;
-          this.isContextAware && this.sendHostInfoToIframe();
-        }
+        // const currentUrl = window.location.href;
+        // if (currentUrl !== this.lastUrl) {
+        //   this.lastUrl = currentUrl;
+        //   this.isContextAware && this.sendHostInfoToIframe();
+        // }
+        this.isContextAware && this.sendHostInfoToIframe();
       }, 1000);
     }
   }
@@ -238,6 +239,7 @@ export default class MentorAI extends HTMLElement {
     const bodyClone: HTMLElement = document.body.cloneNode(true) as HTMLElement;
     const selectorsToRemove: string[] = [
       "script",
+      "no-script",
       "style",
       "nav",
       "footer",
