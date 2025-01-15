@@ -26,7 +26,7 @@ npm install @iblai/iblai-web-mentor
 Include the bundled script in your HTML file:
 
 ```bash
-<script src="https://mentor-ai.s3.us-east-1.amazonaws.com/mentor-ai.js"></script>
+<script src="https://mentor-ai.s3.us-east-1.amazonaws.com/ibai-web-mentor.cjs"></script>
 ```
 
 ## Usage
@@ -41,7 +41,7 @@ Include the component directly in your HTML:
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <script src="https://your-s3-bucket-url/mentor-ai.js"></script>
+    <script src="https://mentor-ai.s3.us-east-1.amazonaws.com/ibai-web-mentor.cjs"></script>
     <title>MentorAI Widget</title>
   </head>
   <body>
@@ -83,7 +83,7 @@ Use the component
 
 ```jsx
 import React from "react";
-import "mentor-ai";
+import "@iblai/iblai-web-mentor";
 
 const App = () => {
   return (

@@ -1,6 +1,8 @@
 export default class MentorAI extends HTMLElement {
   isEmbeddedMentorReady: boolean = false;
   iblData: string = "";
+  // Keeps track of the hosts' page URL
+  lastUrl: string = "";
 
   constructor() {
     super();
@@ -220,11 +222,11 @@ export default class MentorAI extends HTMLElement {
       }
     }
     if (this.isContextAware) {
-      let lastUrl = window.location.href;
+      this.lastUrl = window.location.href;
       setInterval(() => {
         const currentUrl = window.location.href;
-        if (currentUrl !== lastUrl) {
-          lastUrl = currentUrl;
+        if (currentUrl !== this.lastUrl) {
+          this.lastUrl = currentUrl;
           this.isEmbeddedMentorReady && this.sendHostInfoToIframe();
         }
       }, 1000);
