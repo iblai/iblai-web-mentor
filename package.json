@@ -11,6 +11,12 @@
     "dist",
     "mentor-ai.d.ts"
   ],
+  "exports": {
+    ".": {
+      "import": "./dist/iblai-web-mentor.esm.js",
+      "require": "./dist/iblai-web-mentor.cjs.js"
+    }
+  },
   "types": "mentor-ai.d.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
