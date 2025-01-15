@@ -25,7 +25,7 @@ export default class MentorAI extends HTMLElement {
         }
         #ibl-chat-widget-container {
             border: 1px solid #dfdfdf;
-            height: 96%;
+            height: 100%;
             right: 15px;
         }
         @media screen and (max-width: 768px) {
@@ -161,6 +161,18 @@ export default class MentorAI extends HTMLElement {
 
   set mentor(value: string) {
     this.setAttribute("mentor", value);
+  }
+
+  get authRelyOnHost() {
+    return this.hasAttribute("authrelyonhost");
+  }
+
+  set authRelyOnHost(value) {
+    if (value) {
+      this.setAttribute("authrelyonhost", "");
+    } else {
+      this.removeAttribute("authrelyonhost");
+    }
   }
 
   get isAnonymous() {
@@ -321,6 +333,18 @@ export default class MentorAI extends HTMLElement {
   }
 
   redirectToAuthSPA(forceLogout?: boolean) {
+    if (this.authRelyOnHost) {
+      const iframe = this.shadowRoot?.querySelector(
+        "#ibl-chat-widget-container iframe"
+      ) as HTMLIFrameElement;
+      if (iframe && iframe.contentWindow) {
+        iframe.contentWindow.postMessage(
+          JSON.stringify({ ...localStorage }),
+          "*"
+        );
+      }
+      return;
+    }
     const redirectPath: string =
       window.location.pathname + window.location.search;
     window.location.href = `${
