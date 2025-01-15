@@ -1,3 +1,7 @@
+[1.0.3]
+
+- adds authrelyonhost to allow the host send it's localstorage data containing auth tokens required by the mentor
+
 [1.0.2]
 
 - clone the iframe contents in the host website and add as part of the page content
