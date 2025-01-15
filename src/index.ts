@@ -123,6 +123,7 @@ export default class MentorAI extends HTMLElement {
         }
       }
       if (message?.loaded) {
+        this.isEmbeddedMentorReady = true;
         if (this.isContextAware) {
           this.sendHostInfoToIframe();
         }
@@ -227,7 +228,7 @@ export default class MentorAI extends HTMLElement {
         const currentUrl = window.location.href;
         if (currentUrl !== this.lastUrl) {
           this.lastUrl = currentUrl;
-          this.isEmbeddedMentorReady && this.sendHostInfoToIframe();
+          this.isContextAware && this.sendHostInfoToIframe();
         }
       }, 1000);
     }

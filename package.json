@@ -9,6 +9,7 @@
   },
   "files": [
     "dist",
+    "src",
     "mentor-ai.d.ts"
   ],
   "exports": {
