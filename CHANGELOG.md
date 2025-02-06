@@ -1,3 +1,8 @@
+[1.0.4]
+
+- adds context-share.ts
+- adds contextOrigins props to allow only specific origins to share context
+
 [1.0.3]
 
 - adds authrelyonhost to allow the host send it's localstorage data containing auth tokens required by the mentor

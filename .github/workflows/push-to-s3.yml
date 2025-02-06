@@ -31,7 +31,7 @@ jobs:
           npm i -g typescript
           npm run build
           cd dist
-          aws s3 cp ./ibai-web-mentor.cjs.js s3://mentor-ai/
+          aws s3 cp ./iblai-web-mentor.cjs.js s3://mentor-ai/
 
       - name: Latest iblai-web-mentor versionId
         id: get-version
