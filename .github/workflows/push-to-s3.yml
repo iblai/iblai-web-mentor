@@ -36,4 +36,5 @@ jobs:
       - name: Latest iblai-web-mentor versionId
         id: get-version
         run: |
-          echo "Latest iblai-web-mentor version ID is $(aws s3api list-object-versions --bucket mentor-ai --query "Versions[0].VersionId" --output text)"
+          echo "Latest iblai-web-mentor version ID is $(aws s3api list-object-versions --bucket mentor-ai --prefix "iblai-web-mentor.cjs.js" --query "Versions[0].VersionId" --output text)"
+
