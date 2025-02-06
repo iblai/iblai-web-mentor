@@ -1,8 +1,11 @@
+import { cleanElement } from "./utils";
+
 export default class MentorAI extends HTMLElement {
   isEmbeddedMentorReady: boolean = false;
   iblData: string = "";
   // Keeps track of the hosts' page URL
   lastUrl: string = "";
+  private iframeContexts: { [key: string]: string } = {}; // Object to keep track of iframe contexts
 
   constructor() {
     super();
@@ -20,7 +23,6 @@ export default class MentorAI extends HTMLElement {
         border: 0px white;
         height: 100%;
         width: 100%;
-        max-width: 400px;
         border-radius: 0;
         }
         #ibl-chat-widget-container {
@@ -49,6 +51,87 @@ export default class MentorAI extends HTMLElement {
     }
   }
 
+  onPostMessage(event: MessageEvent) {
+    let message: any = event.data;
+    if (typeof message === "string") {
+      try {
+        message = JSON.parse(message);
+      } catch (error) {
+        return;
+      }
+    }
+    // New context handling
+    if (message?.type === "context") {
+      const origin = event.origin; // Get the origin of the iframe
+      if (this.contextOrigins.includes(origin)) {
+        // Check if the origin is whitelisted
+        this.iframeContexts[origin] = message.data; // Store the context data
+      }
+    }
+
+    if (!this.isAnonymous) {
+      if (message?.loaded && message?.auth?.axd_token) {
+        const _userData = document.cookie.includes("userData=")
+          ? document.cookie.split("userData=")[1].split(";")[0]
+          : null;
+        if (!_userData && !this.authRelyOnHost) {
+          this.redirectToAuthSPA(true);
+        }
+      }
+
+      if (
+        message?.loaded &&
+        (!message.auth.axd_token ||
+          !message.auth.dm_token ||
+          message.auth.tenant !== this.tenant ||
+          this.isTokenExpired(message.auth.dm_token_expires) ||
+          this.isTokenExpired(message.auth.axd_token_expires))
+      ) {
+        !this.iblData && this.redirectToAuthSPA();
+      }
+
+      if (message?.loaded && message.auth.userData) {
+        const userData = document.cookie.includes("userData=")
+          ? document.cookie.split("userData=")[1].split(";")[0]
+          : null;
+        if (userData) {
+          try {
+            const parsedUserData = JSON.parse(userData);
+            if (
+              parsedUserData.user_id !==
+              JSON.parse(message.auth.userData).user_id
+            ) {
+              if (this.iblData) {
+                this.sendAuthDataToIframe(this.iblData);
+              }
+            }
+          } catch (error) {
+            console.error("Error parsing userData cookie:", error);
+          }
+        }
+      }
+    }
+    if (message?.authExpired) {
+      if (!this.isAnonymous) {
+        this.redirectToAuthSPA(true);
+      }
+    } else if (message?.ready) {
+      this.isEmbeddedMentorReady = true;
+      if (this.iblData) {
+        this.sendAuthDataToIframe(this.iblData);
+      } else if (!this.authRelyOnHost) {
+        if (!this.isAnonymous) {
+          this.redirectToAuthSPA();
+        }
+      }
+    }
+    if (message?.loaded) {
+      this.isEmbeddedMentorReady = true;
+      if (this.isContextAware) {
+        this.sendHostInfoToIframe();
+      }
+    }
+  }
   connectedCallback() {
     if (this.iblData) {
       const url = new URL(window.location.href);
@@ -58,77 +141,13 @@ export default class MentorAI extends HTMLElement {
       document.cookie = `userData=${userData}; domain=${document.domain}; path=/;`;
     }
 
-    window.addEventListener("message", (event: MessageEvent) => {
-      let message: any = event.data;
-      if (typeof message === "string") {
-        try {
-          message = JSON.parse(message);
-        } catch (error) {
-          return;
-        }
-      }
+    window.addEventListener("message", (event: MessageEvent) =>
+      this.onPostMessage(event)
+    );
+  }
 
-      if (!this.isAnonymous) {
-        if (message?.loaded && message?.auth?.axd_token) {
-          const _userData = document.cookie.includes("userData=")
-            ? document.cookie.split("userData=")[1].split(";")[0]
-            : null;
-          !_userData && this.redirectToAuthSPA(true);
-        }
-
-        if (
-          message?.loaded &&
-          (!message.auth.axd_token ||
-            !message.auth.dm_token ||
-            message.auth.tenant !== this.mentor ||
-            this.isTokenExpired(message.auth.dm_token_expires) ||
-            this.isTokenExpired(message.auth.axd_token_expires))
-        ) {
-          !this.iblData && this.redirectToAuthSPA();
-        }
-
-        if (message?.loaded && message.auth.userData) {
-          const userData = document.cookie.includes("userData=")
-            ? document.cookie.split("userData=")[1].split(";")[0]
-            : null;
-          if (userData) {
-            try {
-              const parsedUserData = JSON.parse(userData);
-              if (
-                parsedUserData.user_id !==
-                JSON.parse(message.auth.userData).user_id
-              ) {
-                if (this.iblData) {
-                  this.sendAuthDataToIframe(this.iblData);
-                }
-              }
-            } catch (error) {
-              console.error("Error parsing userData cookie:", error);
-            }
-          }
-        }
-      }
-      if (message?.authExpired) {
-        if (!this.isAnonymous) {
-          this.redirectToAuthSPA(true);
-        }
-      } else if (message?.ready) {
-        this.isEmbeddedMentorReady = true;
-        if (this.iblData) {
-          this.sendAuthDataToIframe(this.iblData);
-        } else {
-          if (!this.isAnonymous) {
-            this.redirectToAuthSPA();
-          }
-        }
-      }
-      if (message?.loaded) {
-        this.isEmbeddedMentorReady = true;
-        if (this.isContextAware) {
-          this.sendHostInfoToIframe();
-        }
-      }
-    });
+  disconnectedCallback() {
+    window.removeEventListener("message", this.onPostMessage);
   }
 
   get mentorUrl() {
@@ -153,6 +172,14 @@ export default class MentorAI extends HTMLElement {
 
   set tenant(value: string) {
     this.setAttribute("tenant", value);
+  }
+
+  get contextOrigins(): string[] {
+    return this.getAttribute("contextorigins")?.split(",") || [];
+  }
+
+  set contextOrigins(value: string) {
+    this.setAttribute("contextorigins", value);
   }
 
   get mentor(): string | null {
@@ -220,7 +247,14 @@ export default class MentorAI extends HTMLElement {
   }
 
   static get observedAttributes() {
-    return ["mentorUrl", "tenant", "mentor", "isadvanced", "iscontextaware"];
+    return [
+      "mentorUrl",
+      "tenant",
+      "mentor",
+      "isadvanced",
+      "iscontextaware",
+      "contextOrigins", // Add the new attribute to observed attributes
+    ];
   }
 
   attributeChangedCallback(name: string, oldValue: any, newValue: any) {
@@ -245,45 +279,17 @@ export default class MentorAI extends HTMLElement {
         this.isContextAware && this.sendHostInfoToIframe();
       }, 1000);
     }
+    if (name === "contextOrigins") {
+      this.contextOrigins = newValue?.split(",") || []; // Update the context origins when the attribute changes
+    }
   }
 
   getCleanBodyContent(): string {
     const bodyClone: HTMLElement = document.body.cloneNode(true) as HTMLElement;
 
-    // Iterate through all iframes in the original document
-    const iframes = document.querySelectorAll("iframe");
+    // Clean the bodyClone
+    cleanElement(bodyClone);
 
-    iframes.forEach((iframe, index) => {
-      const clonedIframe = bodyClone.querySelectorAll("iframe")[index];
-      if (iframe.contentDocument && clonedIframe) {
-        const iframeContentClone = iframe.contentDocument.body.cloneNode(true);
-        const iframeDocument =
-          clonedIframe.contentDocument || clonedIframe.contentWindow?.document;
-        if (iframeDocument) {
-          iframeDocument.body.innerHTML = "";
-          iframeDocument.body.appendChild(iframeContentClone);
-        }
-      }
-    });
-    const selectorsToRemove: string[] = [
-      "script",
-      "noscript",
-      "style",
-      "nav",
-      "footer",
-      ".ads",
-      ".sidebar",
-      ".popup",
-      ".cookie-banner",
-      "#ibl-chat-widget-container",
-      ".ibl-chat-bubble",
-      "mentor-ai",
-    ];
-    selectorsToRemove.forEach((selector: string) => {
-      const elements: NodeListOf<Element> =
-        bodyClone.querySelectorAll(selector);
-      elements.forEach((element: Element) => element.remove());
-    });
     const removeComments = (node: Node) => {
       for (let i = 0; i < node.childNodes.length; i++) {
         const child = node.childNodes[i];
@@ -296,7 +302,21 @@ export default class MentorAI extends HTMLElement {
       }
     };
     removeComments(bodyClone);
-    return bodyClone.innerHTML;
+
+    // Clean each iframeContext (HTML string) and merge their HTML
+    const iframeHtmls = Object.values(this.iframeContexts).map(
+      (iframeHtml: string) => {
+        const tempDiv = document.createElement("div");
+        tempDiv.innerHTML = iframeHtml; // Parse the HTML string into a DOM element
+        cleanElement(tempDiv); // Clean unwanted selectors
+        return tempDiv.innerHTML; // Return cleaned HTML
+      }
+    );
+
+    // Merge bodyClone HTML with cleaned iframe HTMLs
+    const mergedContent = bodyClone.innerHTML + iframeHtmls.join("");
+
+    return mergedContent; // Return the merged HTML content
   }
 
   sendHostInfoToIframe() {
@@ -338,10 +358,7 @@ export default class MentorAI extends HTMLElement {
         "#ibl-chat-widget-container iframe"
       ) as HTMLIFrameElement;
       if (iframe && iframe.contentWindow) {
-        iframe.contentWindow.postMessage(
-          JSON.stringify({ ...localStorage }),
-          "*"
-        );
+        iframe.contentWindow.postMessage({ ...localStorage }, "*");
       }
       return;
     }

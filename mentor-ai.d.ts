@@ -7,6 +7,7 @@ export interface MentorAIElement extends HTMLElement {
   isAdvanced?: boolean;
   isContextAware?: boolean;
   redirectToken?: string;
+  authRelyOnHost?: boolean;
 }
 declare global {
   interface HTMLElementTagNameMap {
