@@ -1,3 +1,7 @@
+[1.0.5]
+- updates README.md
+- exposes context sharing functions
+
 [1.0.4]
 
 - adds context-share.ts
