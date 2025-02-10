@@ -31,10 +31,10 @@ jobs:
           npm i -g typescript
           npm run build
           cd dist
-          aws s3 cp ./iblai-web-mentor.cjs.js s3://mentor-ai/
+          aws s3 cp ./iblai-web-mentor.umd.js s3://mentor-ai/
 
       - name: Latest iblai-web-mentor versionId
         id: get-version
         run: |
-          echo "Latest iblai-web-mentor version ID is $(aws s3api list-object-versions --bucket mentor-ai --prefix "iblai-web-mentor.cjs.js" --query "Versions[0].VersionId" --output text)"
+          echo "Latest iblai-web-mentor version ID is $(aws s3api list-object-versions --bucket mentor-ai --prefix "iblai-web-mentor.umd.js" --query "Versions[0].VersionId" --output text)"
 
