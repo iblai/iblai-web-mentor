@@ -5,7 +5,7 @@ import terser from "@rollup/plugin-terser";
 import babel from "@rollup/plugin-babel";
 
 export default {
-  input: "./src/index.ts", // Entry point for your web component
+  input: "./src/index.ts",
   output: [
     {
       file: "./dist/iblai-web-mentor.esm.js",

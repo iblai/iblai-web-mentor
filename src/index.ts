@@ -1,5 +1,10 @@
 import { cleanElement } from "./utils";
 
+export {
+  sendHTMLContentToHost,
+  sendHTMLContentToIframe,
+} from "./context-share";
+
 export default class MentorAI extends HTMLElement {
   isEmbeddedMentorReady: boolean = false;
   iblData: string = "";
@@ -288,7 +293,7 @@ export default class MentorAI extends HTMLElement {
     const bodyClone: HTMLElement = document.body.cloneNode(true) as HTMLElement;
 
     // Clean the bodyClone
-    cleanElement(bodyClone);
+    cleanElement(bodyClone.outerHTML);
 
     const removeComments = (node: Node) => {
       for (let i = 0; i < node.childNodes.length; i++) {
@@ -306,10 +311,7 @@ export default class MentorAI extends HTMLElement {
     // Clean each iframeContext (HTML string) and merge their HTML
     const iframeHtmls = Object.values(this.iframeContexts).map(
       (iframeHtml: string) => {
-        const tempDiv = document.createElement("div");
-        tempDiv.innerHTML = iframeHtml; // Parse the HTML string into a DOM element
-        cleanElement(tempDiv); // Clean unwanted selectors
-        return tempDiv.innerHTML; // Return cleaned HTML
+        return cleanElement(iframeHtml); // Clean unwanted selectors
       }
     );
 
@@ -385,4 +387,10 @@ export default class MentorAI extends HTMLElement {
   }
 }
 
-customElements.define("mentor-ai", MentorAI);
+function defineMentorAI() {
+  if (!customElements.get("mentor-ai")) {
+    customElements.define("mentor-ai", MentorAI);
+  }
+}
+
+defineMentorAI();

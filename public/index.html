@@ -4,16 +4,15 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Mentor AI Page</title>
-    <script type="module" src="../dist/iblai-web-mentor.umd.js"></script>
   </head>
   <body style="height: 100vh; width: 100vw">
     <mentor-ai
-      mentorUrl="http://localhost:3001"
+      mentorUrl="http://localhost:3002"
       authUrl="http://localhost:3000"
       tenant="axpalpha"
       mentor="ai-job-scout-assistant"
       redirectToken="b06438a0-4e84-45f7-ba2c-44fdd9241980"
-      contextOrigins="http://localhost:3002"
+      contextOrigins="http://localhost:3002,http://localhost:55477"
       isContextAware
       isAnonymous
       isAdvanced
@@ -31,9 +30,5 @@
       ethical and societal questions about privacy, fairness, and the future of
       human-machine collaboration.
     </p>
-    <iframe
-      src="http://localhost:3002/discover"
-      style="width: 100%; height: 500px; border: none"
-    ></iframe>
   </body>
 </html>

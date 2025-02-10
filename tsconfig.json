@@ -11,6 +11,6 @@
   },
   "include": [
     "src/**/*", // Adjust this path as necessary
-    "mentor-ai.d.ts" // Ensure this is included if it's outside src
+    "mentor-ai.d.ts"
   ]
 }
