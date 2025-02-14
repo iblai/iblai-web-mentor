@@ -1,4 +1,10 @@
+[1.0.6]
+
+- adds lmsUrl and authRelyOnHost properties
+- adds: fetch user platforms and tokens, push to auth SPA
+
 [1.0.5]
+
 - updates README.md
 - exposes context sharing functions
 
