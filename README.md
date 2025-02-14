@@ -69,6 +69,8 @@ Include the component directly in your HTML:
 | isadvanced     | Enables advanced chat features.                                                                                                       | Boolean | false                    |
 | authUrl        | URL for authentication.                                                                                                               | String  | https://auth.iblai.app   |
 | contextOrigins | Comma separated values indicating the origins whitelisted for sending context. Not required.                                          | String  | undefined                |
+| lmsUrl         | URL for edX LMS.                                                                                                                      | String  | learn.iblai.app          |
+| authRelyOnHost | Used to determine if to solely depend on the host for authentication and prevent mentor iframe from redirecting to the auth SPA.      | Boolean | false                    |
 
 ## Javascript Frameworks
 
@@ -182,12 +184,13 @@ This section describes the context sharing functionality implemented in the appl
    This function is used when the application is running inside an iframe and needs to share the page content with the host. It creates a Web Worker to clean the HTML content before sending it to the host.
 
    - **Parameters:**
+
      - `host`: The target host to which the cleaned content will be sent.
      - `interval`: The time interval (in milliseconds) for checking and sending content (default is 5000 ms).
 
    - **Usage:**
      ```javascript
-     MentorAI.sendHTMLContentToHost('https://example.com', 5000);
+     MentorAI.sendHTMLContentToHost("https://example.com", 5000);
      ```
 
 2. **MentorAI.sendHTMLContentToIframe(iframeId: string, iframeHost: string, interval = 5000)**
@@ -195,24 +198,30 @@ This section describes the context sharing functionality implemented in the appl
    This function allows the application to send HTML content to a specified iframe. It also utilizes a Web Worker for cleaning the content before sending it.
 
    - **Parameters:**
+
      - `iframeId`: The ID of the iframe element to which the content will be sent.
      - `iframeHost`: The host of the iframe.
      - `interval`: The time interval (in milliseconds) for checking and sending content (default is 5000 ms).
 
    - **Usage:**
      ```javascript
-     MentorAI.sendHTMLContentToIframe('myIframe', 'https://iframe-host.com', 5000);
+     MentorAI.sendHTMLContentToIframe(
+       "myIframe",
+       "https://iframe-host.com",
+       5000
+     );
      ```
 
 3. **MentorAI.proxyContextPostMessage(targetIdOrHost: string, host?: string)**
 
-   This function proxies post messages of type *context* either to an iframe or to the parent window, depending on the context in which it is called. It listens for incoming messages and forwards them accordingly.
+   This function proxies post messages of type _context_ either to an iframe or to the parent window, depending on the context in which it is called. It listens for incoming messages and forwards them accordingly.
 
    - **Parameters:**
+
      - `targetIdOrHost`: The ID of the target iframe or the host to which the message should be sent.
      - `host`: An optional parameter specifying the host to which the message will be sent.
 
    - **Usage:**
      ```javascript
-     MentorAI.proxyContextPostMessage('myIframe', 'https://iframe-host.com');
+     MentorAI.proxyContextPostMessage("myIframe", "https://iframe-host.com");
      ```

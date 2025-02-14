@@ -1,4 +1,5 @@
 import { cleanElement } from "./utils";
+import { fetchUserTenants, fetchUserTokens } from "./api";
 
 export {
   sendHTMLContentToHost,
@@ -56,7 +57,7 @@ export default class MentorAI extends HTMLElement {
     }
   }
 
-  onPostMessage(event: MessageEvent) {
+  async onPostMessage(event: MessageEvent) {
     let message: any = event.data;
     if (typeof message === "string") {
       try {
@@ -83,7 +84,6 @@ export default class MentorAI extends HTMLElement {
           this.redirectToAuthSPA(true);
         }
       }
-
       if (
         message?.loaded &&
         (!message.auth.axd_token ||
@@ -92,6 +92,29 @@ export default class MentorAI extends HTMLElement {
           this.isTokenExpired(message.auth.dm_token_expires) ||
           this.isTokenExpired(message.auth.axd_token_expires))
       ) {
+        try {
+          const userTenants = await fetchUserTenants(this.lmsUrl);
+
+          const selectedTenant = userTenants.find(
+            (tenant) => tenant.key === this.tenant
+          );
+          if (selectedTenant) {
+            const userTokens = await fetchUserTokens(
+              this.lmsUrl,
+              selectedTenant.key
+            );
+            const userObject = {
+              axd_token: userTokens.axd_token.token,
+              axd_token_expires: userTokens.axd_token.expires,
+              userData: JSON.stringify(userTokens.user),
+              dm_token_expires: userTokens.dm_token.expires,
+              tenant: JSON.stringify(selectedTenant),
+              tenants: JSON.stringify(userTenants),
+              dm_token: userTokens.dm_token.token,
+            };
+            this.sendAuthDataToIframe(userObject);
+          }
+        } catch (error) {}
         !this.iblData && this.redirectToAuthSPA();
       }
 
@@ -169,6 +192,14 @@ export default class MentorAI extends HTMLElement {
 
   set authUrl(value) {
     this.setAttribute("authurl", value);
+  }
+
+  get lmsUrl() {
+    return this.getAttribute("lmsurl") || "https://learn.iblai.app";
+  }
+
+  set lmsUrl(value) {
+    this.setAttribute("lmsurl", value);
   }
 
   get tenant(): string | null {
