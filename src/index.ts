@@ -38,7 +38,6 @@ export default class MentorAI extends HTMLElement {
         }
         @media screen and (max-width: 768px) {
         #ibl-chat-widget-container {
-            max-width: 400px !important;
             right: 20px !important;
         }
         img.ibl-chat-bubble {
@@ -76,14 +75,14 @@ export default class MentorAI extends HTMLElement {
     }
 
     if (!this.isAnonymous) {
-      if (message?.loaded && message?.auth?.axd_token) {
-        const _userData = document.cookie.includes("userData=")
-          ? document.cookie.split("userData=")[1].split(";")[0]
-          : null;
-        if (!_userData && !this.authRelyOnHost) {
-          this.redirectToAuthSPA(true);
-        }
-      }
+      // if (message?.loaded && message?.auth?.axd_token) {
+      //   const _userData = document.cookie.includes("userData=")
+      //     ? document.cookie.split("userData=")[1].split(";")[0]
+      //     : null;
+      //   if (!_userData && !this.authRelyOnHost) {
+      //     this.redirectToAuthSPA(true);
+      //   }
+      // }
       if (
         message?.loaded &&
         (!message.auth.axd_token ||
@@ -119,24 +118,60 @@ export default class MentorAI extends HTMLElement {
       }
 
       if (message?.loaded && message.auth.userData) {
-        const userData = document.cookie.includes("userData=")
-          ? document.cookie.split("userData=")[1].split(";")[0]
-          : null;
-        if (userData) {
-          try {
-            const parsedUserData = JSON.parse(userData);
-            if (
-              parsedUserData.user_id !==
-              JSON.parse(message.auth.userData).user_id
-            ) {
-              if (this.iblData) {
-                this.sendAuthDataToIframe(this.iblData);
-              }
+        try {
+          if (
+            this.edxUserId !==
+            JSON.parse(message.auth.userData).user_id.toString()
+          ) {
+            if (this.iblData) {
+              this.sendAuthDataToIframe(this.iblData);
+            } else {
+              try {
+                const userTenants = await fetchUserTenants(this.lmsUrl);
+
+                const selectedTenant = userTenants.find(
+                  (tenant) => tenant.key === this.tenant
+                );
+                if (selectedTenant) {
+                  const userTokens = await fetchUserTokens(
+                    this.lmsUrl,
+                    selectedTenant.key
+                  );
+                  const userObject = {
+                    axd_token: userTokens.axd_token.token,
+                    axd_token_expires: userTokens.axd_token.expires,
+                    userData: JSON.stringify(userTokens.user),
+                    dm_token_expires: userTokens.dm_token.expires,
+                    tenant: JSON.stringify(selectedTenant),
+                    tenants: JSON.stringify(userTenants),
+                    dm_token: userTokens.dm_token.token,
+                  };
+                  this.sendAuthDataToIframe(userObject);
+                }
+              } catch (error) {}
             }
-          } catch (error) {
-            console.error("Error parsing userData cookie:", error);
           }
+        } catch (error) {
+          console.error("Error parsing userData from auth:", error);
         }
+        // const userData = document.cookie.includes("userData=")
+        //   ? document.cookie.split("userData=")[1].split(";")[0]
+        //   : null;
+        // if (userData) {
+        //   try {
+        //     const parsedUserData = JSON.parse(userData);
+        //     if (
+        //       parsedUserData.user_id !==
+        //       JSON.parse(message.auth.userData).user_id
+        //     ) {
+        //       if (this.iblData) {
+        //         this.sendAuthDataToIframe(this.iblData);
+        //       }
+        //     }
+        //   } catch (error) {
+        //     console.error("Error parsing userData cookie:", error);
+        //   }
+        // }
       }
     }
     if (message?.authExpired) {
@@ -224,6 +259,14 @@ export default class MentorAI extends HTMLElement {
 
   set mentor(value: string) {
     this.setAttribute("mentor", value);
+  }
+
+  get edxUserId(): string | null {
+    return this.getAttribute("edxuserid");
+  }
+
+  set edxUserId(value: string) {
+    this.setAttribute("edxuserid", value);
   }
 
   get authRelyOnHost() {
