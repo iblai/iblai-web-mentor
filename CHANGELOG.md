@@ -1,3 +1,8 @@
+[1.0.8]
+
+- adds edxUserId property (optional)
+- checks that if edxUserId is passed, it matches that in the mentor, else fetch new tokens for current user
+
 [1.0.6]
 
 - adds lmsUrl and authRelyOnHost properties

@@ -71,6 +71,7 @@ Include the component directly in your HTML:
 | contextOrigins | Comma separated values indicating the origins whitelisted for sending context. Not required.                                          | String  | undefined                |
 | lmsUrl         | URL for edX LMS.                                                                                                                      | String  | learn.iblai.app          |
 | authRelyOnHost | Used to determine if to solely depend on the host for authentication and prevent mentor iframe from redirecting to the auth SPA.      | Boolean | false                    |
+| edxUserId      | Indicates the user id on edX. Optional.                                                                                               | String  | undefined                |
 
 ## Javascript Frameworks
 
