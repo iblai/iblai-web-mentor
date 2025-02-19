@@ -1,3 +1,7 @@
+[1.0.9]
+
+- exports proxyContextPostMessage globally
+
 [1.0.8]
 
 - adds edxUserId property (optional)

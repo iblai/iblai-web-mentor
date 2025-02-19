@@ -4,6 +4,7 @@ import { fetchUserTenants, fetchUserTokens } from "./api";
 export {
   sendHTMLContentToHost,
   sendHTMLContentToIframe,
+  proxyContextPostMessage,
 } from "./context-share";
 
 export default class MentorAI extends HTMLElement {
