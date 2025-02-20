@@ -1,3 +1,7 @@
+[1.0.10]
+
+- updates mentor-ai.d.ts with updated prop types
+
 [1.0.9]
 
 - exports proxyContextPostMessage globally
