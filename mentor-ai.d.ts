@@ -1,6 +1,8 @@
 export interface MentorAIElement extends HTMLElement {
   mentorUrl?: string;
   authUrl?: string;
+  lmsUrl?: string;
+  contextOrigins?: string;
   tenant: string;
   mentor: string;
   isAnonymous?: boolean;
