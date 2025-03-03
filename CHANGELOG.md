@@ -1,3 +1,7 @@
+[1.0.11]
+
+- updates: removes more irrelevant content from html content
+
 [1.0.10]
 
 - updates mentor-ai.d.ts with updated prop types
