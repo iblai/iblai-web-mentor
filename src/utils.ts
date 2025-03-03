@@ -26,7 +26,6 @@ export const cleanElement = (element: string) => {
 const workerBlob = new Blob(
   [
     `
-    console.log('######################### worker blob')
     const cleanElement = (htmlString) => {
       const selectorsToRemove = [
         "script",
@@ -41,9 +40,15 @@ const workerBlob = new Blob(
         "#ibl-chat-widget-container",
         ".ibl-chat-bubble",
         "mentor-ai",
+        "link",
+        "meta",
+        "iframe",
       ];
 
       let cleanedHTML = htmlString;
+      
+      // Remove HTML comments
+      cleanedHTML = cleanedHTML.replace(/<!--.*?-->/gs, "");
 
       // Remove elements by tag name
       selectorsToRemove
@@ -73,7 +78,6 @@ const workerBlob = new Blob(
       return cleanedHTML.replace(/\\n/g, "").trim();
     };
     onmessage = function (event) {
-      console.log("######### worker received ", event);
       const htmlContent = event.data; // Get the HTML content from the main thread
       const cleanedContent = cleanElement(htmlContent); // Clean the content
       postMessage(cleanedContent); // Send the cleaned content back to the main thread

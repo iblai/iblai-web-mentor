@@ -17,7 +17,7 @@ export function sendHTMLContentToHost(host: string, interval: number = 5000) {
   // Listen for messages from the worker
   worker.onmessage = (event) => {
     const cleanedContent = event.data; // Get cleaned content from worker
-    window.parent.postMessage({type: 'context', data: cleanedContent}, host); // Send cleaned content to host
+    window.parent.postMessage({ type: "context", data: cleanedContent }, host); // Send cleaned content to host
   };
 
   setInterval(checkAndSendContent, interval);
@@ -28,10 +28,7 @@ export function sendHTMLContentToIframe(
   iframeHost: string,
   interval = 5000
 ) {
-  const iframe: HTMLIFrameElement | null = document.getElementById(
-    iframeId
-  ) as HTMLIFrameElement;
-
+  let iframe: HTMLIFrameElement | null;
   // Create a new Web Worker
   const worker = new Worker(workerUrl);
 
@@ -42,6 +39,7 @@ export function sendHTMLContentToIframe(
 
   // Function to check and send content
   const checkAndSendContent = () => {
+    iframe = document.getElementById(iframeId) as HTMLIFrameElement;
     htmlContent = document.documentElement.outerHTML;
     if (iframe && iframe.contentWindow) {
       worker.postMessage(htmlContent); // Send content to worker for cleaning
@@ -53,10 +51,11 @@ export function sendHTMLContentToIframe(
   // Listen for messages from the worker
   worker.onmessage = (event) => {
     const cleanedContent = event.data; // Get cleaned content from worker
-    if (htmlContent !== previousContent) {
-      iframe?.contentWindow?.postMessage({type: 'context', data: cleanedContent}, iframeHost);
-      previousContent = htmlContent; // Update previous content
-    }
+    iframe?.contentWindow?.postMessage(
+      { type: "context", data: cleanedContent },
+      "*"
+    );
+    previousContent = htmlContent; // Update previous content
   };
 
   // Start the interval
@@ -67,15 +66,18 @@ export function sendHTMLContentToIframe(
 export function proxyContextPostMessage(targetIdOrHost: string, host?: string) {
   // Function to handle incoming messages
   const messageHandler = (event: MessageEvent) => {
-    if (event.data.type === 'context') { // Check if the message type is 'context'
+    if (event.data.type === "context") {
+      // Check if the message type is 'context'
       if (window.self !== window.top) {
         // If in an iframe, send to parent
         window.parent.postMessage(event.data, targetIdOrHost);
       } else {
         // If not in an iframe, send to the specified iframe
-        const iframe: HTMLIFrameElement | null = document.getElementById(targetIdOrHost) as HTMLIFrameElement;
+        const iframe: HTMLIFrameElement | null = document.getElementById(
+          targetIdOrHost
+        ) as HTMLIFrameElement;
         if (iframe && iframe.contentWindow) {
-          const targetHost = host || '*'; // Use the provided host or default to '*'
+          const targetHost = host || "*"; // Use the provided host or default to '*'
           iframe.contentWindow.postMessage(event.data, targetHost);
         } else {
           console.log("Iframe not found or contentWindow is not accessible.");
@@ -85,5 +87,5 @@ export function proxyContextPostMessage(targetIdOrHost: string, host?: string) {
   };
 
   // Listen for messages from the window
-  window.addEventListener('message', messageHandler);
+  window.addEventListener("message", messageHandler);
 }
