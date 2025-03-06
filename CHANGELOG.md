@@ -1,3 +1,7 @@
+[1.0.13]
+
+- updates: sendHTMLContentToIframe could now take as parameter an iframe element or an iframe ID
+
 [1.0.12]
 
 - fix: infinite reloading of the iframe with send tenant in userObject as tenant key instead of a stringified tenant object
