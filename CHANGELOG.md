@@ -1,3 +1,7 @@
+[1.0.12]
+
+- fix: infinite reloading of the iframe with send tenant in userObject as tenant key instead of a stringified tenant object
+
 [1.0.11]
 
 - updates: removes more irrelevant content from html content
