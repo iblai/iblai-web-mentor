@@ -108,7 +108,7 @@ export default class MentorAI extends HTMLElement {
               axd_token_expires: userTokens.axd_token.expires,
               userData: JSON.stringify(userTokens.user),
               dm_token_expires: userTokens.dm_token.expires,
-              tenant: JSON.stringify(selectedTenant),
+              tenant: selectedTenant.key,
               tenants: JSON.stringify(userTenants),
               dm_token: userTokens.dm_token.token,
             };
@@ -143,7 +143,7 @@ export default class MentorAI extends HTMLElement {
                     axd_token_expires: userTokens.axd_token.expires,
                     userData: JSON.stringify(userTokens.user),
                     dm_token_expires: userTokens.dm_token.expires,
-                    tenant: JSON.stringify(selectedTenant),
+                    tenant: selectedTenant.key,
                     tenants: JSON.stringify(userTenants),
                     dm_token: userTokens.dm_token.token,
                   };
