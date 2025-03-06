@@ -49,7 +49,7 @@ const workerBlob = new Blob(
       
       // Remove HTML comments
       cleanedHTML = cleanedHTML.replace(/<!--.*?-->/gs, "");
-
+      cleanedHTML = cleanedHTML.replace("\\n", "");
       // Remove elements by tag name
       selectorsToRemove
         .filter((selector) => !selector.startsWith(".") && !selector.startsWith("#"))

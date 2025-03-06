@@ -24,7 +24,7 @@ export function sendHTMLContentToHost(host: string, interval: number = 5000) {
 }
 
 export function sendHTMLContentToIframe(
-  iframeId: string,
+  iframeId: string | HTMLIFrameElement,
   iframeHost: string,
   interval = 5000
 ) {
@@ -39,7 +39,12 @@ export function sendHTMLContentToIframe(
 
   // Function to check and send content
   const checkAndSendContent = () => {
-    iframe = document.getElementById(iframeId) as HTMLIFrameElement;
+    // Check if iframeId is already an iframe element
+    if (iframeId instanceof HTMLIFrameElement) {
+      iframe = iframeId; // Use iframeId directly
+    } else {
+      iframe = document.getElementById(iframeId) as HTMLIFrameElement; // Fallback to getting the element by ID
+    }
     htmlContent = document.documentElement.outerHTML;
     if (iframe && iframe.contentWindow) {
       worker.postMessage(htmlContent); // Send content to worker for cleaning
