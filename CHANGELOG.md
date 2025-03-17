@@ -1,3 +1,8 @@
+[1.0.14]
+
+- adds component prop to indicate the component of the mentor to display
+- adds modal prop to indicate the modal to display
+
 [1.0.13]
 
 - updates: sendHTMLContentToIframe could now take as parameter an iframe element or an iframe ID
