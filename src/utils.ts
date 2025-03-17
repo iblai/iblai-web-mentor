@@ -89,3 +89,10 @@ const workerBlob = new Blob(
 
 // Create an object URL for the Blob
 export const workerUrl = URL.createObjectURL(workerBlob);
+
+export const getParamsFromComponent = (component: "chat" | null) => {
+  if (component === "chat") {
+    return "&hide_side_nav=true&hide_header=true";
+  }
+  return "";
+};

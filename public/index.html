@@ -4,60 +4,24 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Mentor AI Page</title>
-    <script>
-      function loadScript(url) {
-        return new Promise((resolve, reject) => {
-          if (document.querySelector(`script[src="${url}"]`)) {
-            resolve();
-            return;
-          }
-          const script = document.createElement("script");
-          script.src = url;
-          script.async = true;
-          script.onload = () => {
-            resolve();
-          };
-          script.onerror = () =>
-            reject(new Error(`Failed to load script: ${url}`));
-          document.head.appendChild(script);
-        });
-      }
-      document.addEventListener("DOMContentLoaded", () => {
-        loadScript("http://localhost:5500/dist/iblai-web-mentor.umd.js").then(
-          () => {
-            const iframesOfInterest = document.querySelectorAll(
-              'iframe[src^="https://lti-ri.imsglobal.org"]'
-            );
-            console.log("################", iframesOfInterest);
-            iframesOfInterest.forEach((iframe) => {
-              MentorAI.sendHTMLContentToIframe(
-                iframe,
-                "https://lti-ri.imsglobal.org",
-                5000
-              );
-            });
-          }
-        );
-      });
-    </script>
+    <script src="../dist/iblai-web-mentor.umd.js"></script>
   </head>
-  <body style="height: 100vh; width: 100vw">
-    <!-- <mentor-ai
+  <body style="height: 400px; width: 100%; margin: 0">
+    <mentor-ai
       mentorUrl="http://localhost:3002"
       authUrl="http://localhost:3000"
-      tenant="axpalpha"
-      lmsUrl="https://learn.iblai.app"
+      tenant="gillis1"
+      lmsUrl="https://learn.iblai.tech"
       mentor="ai-job-scout-assistant"
-      redirectToken="b06438af-4e84-45f7-ba2c-44fdd9241981"
+      redirectToken="2007d5b0-ebd6-4f9f-82cd-78d8566f2c73"
       contextOrigins="http://localhost:3002,http://localhost:55477"
       isContextAware
-      isAdvanced
-      authRelyOnHost
-    ></mentor-ai> -->
-    <iframe
+      modal="datasets"
+    ></mentor-ai>
+    <!-- <iframe
       style="width: 80vw; height: 90vh"
       src="https://lti-ri.imsglobal.org/platforms/5384/resource_links/79380/connects?user_id=970038"
-    ></iframe>
+    ></iframe> -->
 
     <p>
       Artificial Intelligence (AI) is a transformative field of computer science

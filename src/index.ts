@@ -1,4 +1,4 @@
-import { cleanElement } from "./utils";
+import { cleanElement, getParamsFromComponent } from "./utils";
 import { fetchUserTenants, fetchUserTokens } from "./api";
 
 export {
@@ -326,6 +326,22 @@ export default class MentorAI extends HTMLElement {
     this.setAttribute("redirecttoken", value);
   }
 
+  get component(): "chat" | null {
+    return this.getAttribute("component") as "chat" | null;
+  }
+
+  set component(value: string) {
+    this.setAttribute("component", value);
+  }
+
+  get modal(): "dataset" | "settings" | null {
+    return this.getAttribute("modal") as "dataset" | "settings" | null;
+  }
+
+  set modal(value: string) {
+    this.setAttribute("modal", value);
+  }
+
   static get observedAttributes() {
     return [
       "mentorUrl",
@@ -334,18 +350,33 @@ export default class MentorAI extends HTMLElement {
       "isadvanced",
       "iscontextaware",
       "contextOrigins", // Add the new attribute to observed attributes
+      "component",
+      "modal",
     ];
   }
 
   attributeChangedCallback(name: string, oldValue: any, newValue: any) {
-    if (["mentorUrl", "tenant", "mentor", "isadvanced"].includes(name)) {
+    if (
+      [
+        "mentorUrl",
+        "tenant",
+        "mentor",
+        "isadvanced",
+        "component",
+        "modal",
+      ].includes(name)
+    ) {
       const iframe = this.shadowRoot?.querySelector("iframe");
       if (this.shadowRoot && iframe) {
         iframe.src = `${this.mentorUrl}/platform/${this.tenant}/${
           this.mentor
+        }/${
+          this.modal ? this.modal : ""
         }?embed=true&mode=anonymous&extra-body-classes=iframed-externally${
           this.isAdvanced ? "&chat=advanced" : ""
-        }`;
+        }${this.modal ? "&modal=" + this.modal : ""}${getParamsFromComponent(
+          this.component
+        )}`;
       }
     }
     if (this.isContextAware) {
