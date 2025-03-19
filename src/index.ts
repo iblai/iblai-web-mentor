@@ -74,16 +74,11 @@ export default class MentorAI extends HTMLElement {
         this.iframeContexts[origin] = message.data; // Store the context data
       }
     }
-
+    console.log(
+      "######################## message received from mentor",
+      message
+    );
     if (!this.isAnonymous) {
-      // if (message?.loaded && message?.auth?.axd_token) {
-      //   const _userData = document.cookie.includes("userData=")
-      //     ? document.cookie.split("userData=")[1].split(";")[0]
-      //     : null;
-      //   if (!_userData && !this.authRelyOnHost) {
-      //     this.redirectToAuthSPA(true);
-      //   }
-      // }
       if (
         message?.loaded &&
         (!message.auth.axd_token ||
@@ -155,24 +150,6 @@ export default class MentorAI extends HTMLElement {
         } catch (error) {
           console.error("Error parsing userData from auth:", error);
         }
-        // const userData = document.cookie.includes("userData=")
-        //   ? document.cookie.split("userData=")[1].split(";")[0]
-        //   : null;
-        // if (userData) {
-        //   try {
-        //     const parsedUserData = JSON.parse(userData);
-        //     if (
-        //       parsedUserData.user_id !==
-        //       JSON.parse(message.auth.userData).user_id
-        //     ) {
-        //       if (this.iblData) {
-        //         this.sendAuthDataToIframe(this.iblData);
-        //       }
-        //     }
-        //   } catch (error) {
-        //     console.error("Error parsing userData cookie:", error);
-        //   }
-        // }
       }
     }
     if (message?.authExpired) {
