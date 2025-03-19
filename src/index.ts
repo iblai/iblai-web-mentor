@@ -113,8 +113,9 @@ export default class MentorAI extends HTMLElement {
       if (message?.loaded && message.auth.userData) {
         try {
           if (
+            this.edxUserId &&
             this.edxUserId !=
-            JSON.parse(message.auth.userData).user_id.toString()
+              JSON.parse(message.auth.userData).user_id.toString()
           ) {
             if (this.iblData) {
               console.log("############## sending auth to iframe in 120");
