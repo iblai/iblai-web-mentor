@@ -1,3 +1,7 @@
+[1.0.15]
+
+- removes console logs
+
 [1.0.14]
 
 - adds component prop to indicate the component of the mentor to display
