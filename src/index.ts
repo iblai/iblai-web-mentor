@@ -103,7 +103,6 @@ export default class MentorAI extends HTMLElement {
               tenants: JSON.stringify(userTenants),
               dm_token: userTokens.dm_token.token,
             };
-            console.log("############## sending auth to iframe in 106");
             this.sendAuthDataToIframe(userObject);
           }
         } catch (error) {}
@@ -118,7 +117,6 @@ export default class MentorAI extends HTMLElement {
               JSON.parse(message.auth.userData).user_id.toString()
           ) {
             if (this.iblData) {
-              console.log("############## sending auth to iframe in 120");
               this.sendAuthDataToIframe(this.iblData);
             } else {
               try {
@@ -141,7 +139,6 @@ export default class MentorAI extends HTMLElement {
                     tenants: JSON.stringify(userTenants),
                     dm_token: userTokens.dm_token.token,
                   };
-                  console.log("############## sending auth to iframe in 143");
                   this.sendAuthDataToIframe(userObject);
                 }
               } catch (error) {}
@@ -159,7 +156,6 @@ export default class MentorAI extends HTMLElement {
     } else if (message?.ready) {
       this.isEmbeddedMentorReady = true;
       if (this.iblData) {
-        console.log("############## sending auth to iframe in 161");
         this.sendAuthDataToIframe(this.iblData);
       } else if (!this.authRelyOnHost) {
         if (!this.isAnonymous) {
