@@ -169,6 +169,7 @@ export default class MentorAI extends HTMLElement {
         this.sendHostInfoToIframe();
       }
       if (this.theme) {
+        console.log("################# switching theme to ", this.theme);
         this.switchTheme(this.theme);
       }
     }
@@ -438,7 +439,7 @@ export default class MentorAI extends HTMLElement {
       "#ibl-chat-widget-container iframe"
     ) as HTMLIFrameElement;
     if (iframe && iframe.contentWindow) {
-      iframe.contentWindow.postMessage({ theme }, "*");
+      iframe.contentWindow.postMessage(JSON.stringify({ theme }), "*");
     }
   }
 
