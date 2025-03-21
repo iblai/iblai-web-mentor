@@ -168,6 +168,9 @@ export default class MentorAI extends HTMLElement {
       if (this.isContextAware) {
         this.sendHostInfoToIframe();
       }
+      if (this.theme) {
+        this.switchTheme(this.theme);
+      }
     }
   }
   connectedCallback() {
@@ -210,6 +213,14 @@ export default class MentorAI extends HTMLElement {
 
   set lmsUrl(value) {
     this.setAttribute("lmsurl", value);
+  }
+
+  get theme(): Theme {
+    return (this.getAttribute("theme") as Theme) || "light";
+  }
+
+  set theme(value: Theme) {
+    this.setAttribute("theme", value);
   }
 
   get tenant(): string | null {
@@ -367,6 +378,9 @@ export default class MentorAI extends HTMLElement {
     if (name === "contextOrigins") {
       this.contextOrigins = newValue?.split(",") || []; // Update the context origins when the attribute changes
     }
+    if (name === "theme") {
+      this.switchTheme(newValue);
+    }
   }
 
   getCleanBodyContent(): string {
@@ -416,6 +430,15 @@ export default class MentorAI extends HTMLElement {
         pageContent: bodyContent,
       };
       iframe.contentWindow.postMessage(payload, "*");
+    }
+  }
+
+  switchTheme(theme: string) {
+    const iframe = this.shadowRoot?.querySelector(
+      "#ibl-chat-widget-container iframe"
+    ) as HTMLIFrameElement;
+    if (iframe && iframe.contentWindow) {
+      iframe.contentWindow.postMessage({ theme }, "*");
     }
   }
 
