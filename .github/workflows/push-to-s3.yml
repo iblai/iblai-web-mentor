@@ -35,8 +35,9 @@ jobs:
           npm run build
           cd dist
           aws s3 cp ./iblai-web-mentor.umd.js s3://mentor-ai/
+          aws s3 cp ./iblai-web-mentor.umd.js s3://mentor-ai/web/mentorai.js
 
       - name: Latest iblai-web-mentor versionId
         id: get-version
         run: |
-          echo "Latest iblai-web-mentor version ID is $(aws s3api list-object-versions --bucket mentor-ai --prefix "iblai-web-mentor.umd.js" --query "Versions[0].VersionId" --output text)"
+          echo "Latest mentorai.js version ID is $(aws s3api list-object-versions --bucket mentor-ai --prefix "web/mentorai.js" --query "Versions[0].VersionId" --output text)"
