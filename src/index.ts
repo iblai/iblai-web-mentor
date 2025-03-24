@@ -45,10 +45,31 @@ export default class MentorAI extends HTMLElement {
             right: 20px !important;
         }
         }
+        .spinner {
+            border: 8px solid #f3f3f3; /* Light grey */
+            border-top: 8px solid #6cafe1; /* Blue */
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            display: none; /* Initially hidden */
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
     </style>
     <div id="ibl-chat-widget-container">
+        <div class="spinner" id="loading-spinner"></div>
         <iframe
         allow="clipboard-read; clipboard-write"
+        onload="this.parentNode.querySelector('#loading-spinner').style.display='none';"
+        onloadstart="this.parentNode.querySelector('#loading-spinner').style.display='block';"
         ></iframe>
     </div>
         `;
@@ -66,6 +87,7 @@ export default class MentorAI extends HTMLElement {
         return;
       }
     }
+
     // New context handling
     if (message?.type === "context") {
       const origin = event.origin; // Get the origin of the iframe
@@ -74,6 +96,17 @@ export default class MentorAI extends HTMLElement {
         this.iframeContexts[origin] = message.data; // Store the context data
       }
     }
+
+    // New height handling
+    if (message?.height) {
+      const container = this.shadowRoot?.querySelector(
+        "#ibl-chat-widget-container"
+      ) as HTMLElement;
+      if (container) {
+        container.style.height = `${message.height}px`; // Set the height based on the message
+      }
+    }
+
     if (!this.isAnonymous) {
       if (
         message?.loaded &&
@@ -186,6 +219,27 @@ export default class MentorAI extends HTMLElement {
     window.addEventListener("message", (event: MessageEvent) =>
       this.onPostMessage(event)
     );
+
+    // Show the spinner when the iframe starts loading
+    const iframe = this.shadowRoot?.querySelector("iframe");
+    if (iframe) {
+      iframe.onloadstart = () => {
+        const spinner = this.shadowRoot?.querySelector(
+          "#loading-spinner"
+        ) as HTMLElement;
+        if (spinner) {
+          spinner.style.display = "block";
+        }
+      };
+      iframe.onload = () => {
+        const spinner = this.shadowRoot?.querySelector(
+          "#loading-spinner"
+        ) as HTMLElement;
+        if (spinner) {
+          spinner.style.display = "none";
+        }
+      };
+    }
   }
 
   disconnectedCallback() {
@@ -354,8 +408,8 @@ export default class MentorAI extends HTMLElement {
     ) {
       const iframe = this.shadowRoot?.querySelector("iframe");
       if (this.shadowRoot && iframe) {
-        iframe.src = `${this.mentorUrl}/platform/${this.tenant}/${
-          this.mentor
+        iframe.src = `${this.mentorUrl}/platform/${this.tenant}/${this.mentor}${
+          this.component != "chat" ? "/" + this.component : ""
         }/${
           this.modal ? this.modal : ""
         }?embed=true&mode=anonymous&extra-body-classes=iframed-externally${

@@ -10,6 +10,9 @@ export interface MentorAIElement extends HTMLElement {
   isContextAware?: boolean;
   redirectToken?: string;
   authRelyOnHost?: boolean;
+  theme?: Theme;
+  modal?: string;
+  component: string;
 }
 declare global {
   interface HTMLElementTagNameMap {
