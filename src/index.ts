@@ -99,6 +99,7 @@ export default class MentorAI extends HTMLElement {
 
     // New height handling
     if (message?.height) {
+      console.log("############## received height", message.height);
       const container = this.shadowRoot?.querySelector(
         "#ibl-chat-widget-container"
       ) as HTMLElement;
