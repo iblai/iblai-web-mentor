@@ -1,3 +1,8 @@
+[1.1.0]
+
+- adds spinner while the iframe loads
+- adjust height of iframe as the embed grows
+
 [1.0.16]
 
 - adds theme prop to enable changing theme. Values could be 'light' or 'dark'
