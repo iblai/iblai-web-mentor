@@ -410,7 +410,7 @@ export default class MentorAI extends HTMLElement {
       const iframe = this.shadowRoot?.querySelector("iframe");
       if (this.shadowRoot && iframe) {
         iframe.src = `${this.mentorUrl}/platform/${this.tenant}/${this.mentor}${
-          this.component != "chat" ? "/" + this.component : ""
+          this.component && this.component != "chat" ? "/" + this.component : ""
         }/${
           this.modal ? this.modal : ""
         }?embed=true&mode=anonymous&extra-body-classes=iframed-externally${
