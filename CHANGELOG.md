@@ -1,3 +1,7 @@
+[1.1.1]
+
+- updates README.md
+
 [1.1.0]
 
 - adds spinner while the iframe loads
