@@ -77,6 +77,7 @@ Include the component directly in your HTML:
 | edxUserId      | Indicates the user id on edX. Optional.                                                                                                             | String  | undefined                |
 | theme          | Sets the theme of the component. Can be either `light` or `dark`.                                                                                   | String  | light                    |
 | component      | Specifies the component to display in the mentor application. Can be one of `analytics-overview`, `analytics-users`, `analytics-topics`, or `chat`. | String  | chat                     |
+| redirectToken  | A token used by the auth layer to redirect back to the equivalent set URL.                                                                          | String  | undefined                |
 
 ## Javascript Frameworks
 
