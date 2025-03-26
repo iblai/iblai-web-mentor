@@ -47,11 +47,14 @@ Include the component directly in your HTML:
   <body>
     <mentor-ai
       mentorurl="https://mentor.iblai.app"
+      authurl="https://auth.iblai.app"
+      lmsurl="https://learn.iblai.app"
       tenant="your-tenant"
       mentor="mentor-id"
       isanonymous
       iscontextaware
       isadvanced
+      theme="light"
     ></mentor-ai>
   </body>
 </html>
@@ -59,19 +62,21 @@ Include the component directly in your HTML:
 
 ### Attributes
 
-| Attribute      | Description                                                                                                                           | Type    | Default Value            |
-| -------------- | ------------------------------------------------------------------------------------------------------------------------------------- | ------- | ------------------------ |
-| mentorurl      | URL of the MentorAI platform.                                                                                                         | String  | https://mentor.iblai.app |
-| tenant         | Tenant name for authentication.                                                                                                       | String  | undefined                |
-| mentor         | Mentor name for the chat widget.                                                                                                      | String  | undefined                |
-| isanonymous    | Enables anonymous mode. If set, the component will not require user authentication. (Ensure this matches the anonymity of the mentor) | Boolean | false                    |
-| iscontextaware | Enables context-aware functionality to send page information to the iframe.                                                           | Boolean | false                    |
-| isadvanced     | Enables advanced chat features.                                                                                                       | Boolean | false                    |
-| authUrl        | URL for authentication.                                                                                                               | String  | https://auth.iblai.app   |
-| contextOrigins | Comma separated values indicating the origins whitelisted for sending context. Not required.                                          | String  | undefined                |
-| lmsUrl         | URL for edX LMS.                                                                                                                      | String  | learn.iblai.app          |
-| authRelyOnHost | Used to determine if to solely depend on the host for authentication and prevent mentor iframe from redirecting to the auth SPA.      | Boolean | false                    |
-| edxUserId      | Indicates the user id on edX. Optional.                                                                                               | String  | undefined                |
+| Attribute      | Description                                                                                                                                         | Type    | Default Value            |
+| -------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- | ------- | ------------------------ |
+| mentorurl      | URL of the MentorAI platform.                                                                                                                       | String  | https://mentor.iblai.app |
+| tenant         | Tenant name for authentication.                                                                                                                     | String  | undefined                |
+| mentor         | Mentor name for the chat widget.                                                                                                                    | String  | undefined                |
+| isanonymous    | Enables anonymous mode. If set, the component will not require user authentication. (Ensure this matches the anonymity of the mentor)               | Boolean | false                    |
+| iscontextaware | Enables context-aware functionality to send page information to the iframe.                                                                         | Boolean | false                    |
+| isadvanced     | Enables advanced chat features.                                                                                                                     | Boolean | false                    |
+| authUrl        | URL for authentication.                                                                                                                             | String  | https://auth.iblai.app   |
+| contextOrigins | Comma separated values indicating the origins whitelisted for sending context. Defaults to an empty string.                                         | String  | ""                       |
+| lmsUrl         | URL for edX LMS.                                                                                                                                    | String  | learn.iblai.app          |
+| authRelyOnHost | Used to determine if to solely depend on the host for authentication and prevent mentor iframe from redirecting to the auth SPA.                    | Boolean | false                    |
+| edxUserId      | Indicates the user id on edX. Optional.                                                                                                             | String  | undefined                |
+| theme          | Sets the theme of the component. Can be either `light` or `dark`.                                                                                   | String  | light                    |
+| component      | Specifies the component to display in the mentor application. Can be one of `analytics-overview`, `analytics-users`, `analytics-topics`, or `chat`. | String  | chat                     |
 
 ## Javascript Frameworks
 
@@ -94,12 +99,14 @@ const App = () => {
     <div>
       <mentor-ai
         mentorurl="https://mentor.iblai.app"
-        authUrl="https://auth.iblai.app"
+        authurl="https://auth.iblai.app"
+        lmsurl="https://learn.iblai.app"
         tenant="your-tenant"
-        mentor="mentor-name"
+        mentor="mentor-id"
         isanonymous
         iscontextaware
         isadvanced
+        theme="light"
       ></mentor-ai>
     </div>
   );
@@ -121,12 +128,14 @@ Use the component in your template:
 ```html
 <mentor-ai
   mentorurl="https://mentor.iblai.app"
-  authUrl="https://auth.iblai.app"
+  authurl="https://auth.iblai.app"
+  lmsurl="https://learn.iblai.app"
   tenant="your-tenant"
   mentor="mentor-id"
   isanonymous
   iscontextaware
   isadvanced
+  theme="light"
 ></mentor-ai>
 ```
 
@@ -158,12 +167,14 @@ Use the component:
 <template>
   <mentor-ai
     mentorurl="https://mentor.iblai.app"
-    authUrl="https://auth.iblai.app"
+    authurl="https://auth.iblai.app"
+    lmsurl="https://learn.iblai.app"
     tenant="your-tenant"
     mentor="mentor-id"
     isanonymous
     iscontextaware
     isadvanced
+    theme="light"
   ></mentor-ai>
 </template>
 
