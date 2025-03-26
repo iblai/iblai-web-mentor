@@ -26,7 +26,7 @@ npm install @iblai/iblai-web-mentor
 Include the bundled script in your HTML file:
 
 ```bash
-<script src="https://mentor-ai.s3.us-east-1.amazonaws.com/ibai-web-mentor.cjs"></script>
+<script src="https://ibl.ai/web/mentorai.js?versionId=uiaXhVA5qhkZFEfJnGUhPU4cr43yQnzA"></script>
 ```
 
 ## Usage
