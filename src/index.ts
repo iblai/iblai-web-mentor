@@ -99,7 +99,6 @@ export default class MentorAI extends HTMLElement {
 
     // New height handling
     if (message?.height) {
-      console.log("############## received height", message.height);
       const container = this.shadowRoot?.querySelector(
         "#ibl-chat-widget-container"
       ) as HTMLElement;
@@ -185,7 +184,11 @@ export default class MentorAI extends HTMLElement {
     }
     if (message?.authExpired) {
       if (!this.isAnonymous) {
-        this.redirectToAuthSPA(true);
+        if (this.iblData) {
+          this.sendAuthDataToIframe(this.iblData);
+        } else {
+          this.redirectToAuthSPA(true);
+        }
       }
     } else if (message?.ready) {
       this.isEmbeddedMentorReady = true;
@@ -203,7 +206,6 @@ export default class MentorAI extends HTMLElement {
         this.sendHostInfoToIframe();
       }
       if (this.theme) {
-        console.log("################# switching theme to ", this.theme);
         this.switchTheme(this.theme);
       }
     }
