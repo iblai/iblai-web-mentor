@@ -1,3 +1,7 @@
+[1.2.0]
+
+- adds spinner while mentor iframe loads
+
 [1.1.1]
 
 - updates README.md
