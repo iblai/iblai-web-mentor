@@ -91,10 +91,45 @@ const workerBlob = new Blob(
 export const workerUrl = URL.createObjectURL(workerBlob);
 
 export const getParamsFromComponent = (
-  component: "chat" | "analytics" | "prompt-gallery" | null
+  component:
+    | "chat"
+    | "analytics-overview"
+    | "analytics-users"
+    | "analytics-topics"
+    | "prompt-gallery"
+    | null
 ) => {
-  if (["chat", "analytics", "prompt-gallery"].includes(component ?? "")) {
+  if (
+    [
+      "chat",
+      "analytics-overview",
+      "analytics-users",
+      "analytics-topics",
+      "prompt-gallery",
+    ].includes(component ?? "")
+  ) {
     return "&hide_side_nav=true&hide_header=true";
   }
   return "";
+};
+
+export const getUrlFromComponent = (
+  component:
+    | "chat"
+    | "analytics-overview"
+    | "analytics-users"
+    | "analytics-topics"
+    | "prompt-gallery"
+    | null
+) => {
+  switch (component) {
+    case "analytics-overview":
+      return "analytics";
+    case "analytics-users":
+      return "analytics/users";
+    case "analytics-topics":
+      return "analytics/topics";
+    default:
+      return "";
+  }
 };

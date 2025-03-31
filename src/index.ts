@@ -1,4 +1,8 @@
-import { cleanElement, getParamsFromComponent } from "./utils";
+import {
+  cleanElement,
+  getParamsFromComponent,
+  getUrlFromComponent,
+} from "./utils";
 import { fetchUserTenants, fetchUserTokens } from "./api";
 
 export {
@@ -411,9 +415,9 @@ export default class MentorAI extends HTMLElement {
     ) {
       const iframe = this.shadowRoot?.querySelector("iframe");
       if (this.shadowRoot && iframe) {
-        iframe.src = `${this.mentorUrl}/platform/${this.tenant}/${this.mentor}${
-          this.component && this.component != "chat" ? "/" + this.component : ""
-        }/${
+        iframe.src = `${this.mentorUrl}/platform/${this.tenant}/${
+          this.mentor
+        }${getUrlFromComponent(this.component)}/${
           this.modal ? this.modal : ""
         }?embed=true&mode=anonymous&extra-body-classes=iframed-externally${
           this.isAdvanced ? "&chat=advanced" : ""
