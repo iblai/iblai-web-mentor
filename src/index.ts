@@ -33,9 +33,10 @@ export default class MentorAI extends HTMLElement {
         border-radius: 0;
         }
         #ibl-chat-widget-container {
-            border: 1px solid #dfdfdf;
+            /* border: 1px solid #dfdfdf; */
             height: 100%;
             right: 15px;
+            position: relative;
         }
         @media screen and (max-width: 768px) {
         #ibl-chat-widget-container {
@@ -46,8 +47,8 @@ export default class MentorAI extends HTMLElement {
         }
         }
         .spinner {
-            border: 8px solid #f3f3f3; /* Light grey */
-            border-top: 8px solid #6cafe1; /* Blue */
+            border: 3px solid #f3f3f3; /* Light grey */
+            border-top: 3px solid #6cafe1; /* Blue */
             border-radius: 50%;
             width: 40px;
             height: 40px;
@@ -56,7 +57,7 @@ export default class MentorAI extends HTMLElement {
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            display: none; /* Initially hidden */
+            display: block; /* Initially hidden */
         }
 
         @keyframes spin {
@@ -67,9 +68,9 @@ export default class MentorAI extends HTMLElement {
     <div id="ibl-chat-widget-container">
         <div class="spinner" id="loading-spinner"></div>
         <iframe
-        allow="clipboard-read; clipboard-write"
-        onload="this.parentNode.querySelector('#loading-spinner').style.display='none';"
-        onloadstart="this.parentNode.querySelector('#loading-spinner').style.display='block';"
+          allow="clipboard-read; clipboard-write"
+          onload="this.parentNode.querySelector('#loading-spinner').style.display='none';"
+          onloadstart="this.parentNode.querySelector('#loading-spinner').style.display='block';"
         ></iframe>
     </div>
         `;
