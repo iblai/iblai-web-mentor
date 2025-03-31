@@ -124,11 +124,11 @@ export const getUrlFromComponent = (
 ) => {
   switch (component) {
     case "analytics-overview":
-      return "analytics";
+      return "/analytics";
     case "analytics-users":
-      return "analytics/users";
+      return "/analytics/users";
     case "analytics-topics":
-      return "analytics/topics";
+      return "/analytics/topics";
     default:
       return "";
   }
