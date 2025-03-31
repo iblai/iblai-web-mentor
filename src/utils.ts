@@ -108,7 +108,7 @@ export const getParamsFromComponent = (
       "prompt-gallery",
     ].includes(component ?? "")
   ) {
-    return "&hide_side_nav=true&hide_header=true";
+    return `&hide_side_nav=true&hide_header=true&component=${component}`;
   }
   return "";
 };
