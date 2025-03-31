@@ -35,12 +35,11 @@ export default class MentorAI extends HTMLElement {
         #ibl-chat-widget-container {
             /* border: 1px solid #dfdfdf; */
             height: 100%;
-            right: 15px;
             position: relative;
         }
         @media screen and (max-width: 768px) {
         #ibl-chat-widget-container {
-            right: 20px !important;
+
         }
         img.ibl-chat-bubble {
             right: 20px !important;
