@@ -1,3 +1,9 @@
+[1.2.1]
+
+- adds recent-messages iframe
+- adds explore iframe
+- adds prompt-gallery iframe
+
 [1.2.0]
 
 - adds spinner while mentor iframe loads
