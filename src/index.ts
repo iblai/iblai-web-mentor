@@ -4,6 +4,7 @@ import {
   getUrlFromComponent,
 } from "./utils";
 import { fetchUserTenants, fetchUserTokens } from "./api";
+import { Theme } from "./models";
 
 export {
   sendHTMLContentToHost,
