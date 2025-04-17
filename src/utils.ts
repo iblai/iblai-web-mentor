@@ -1,26 +1,28 @@
+import { Component } from './models';
+
 export const cleanElement = (element: string) => {
   const selectorsToRemove: string[] = [
-    "script",
-    "noscript",
-    "style",
-    "nav",
-    "footer",
-    ".ads",
-    ".sidebar",
-    ".popup",
-    ".cookie-banner",
-    "#ibl-chat-widget-container",
-    ".ibl-chat-bubble",
-    "mentor-ai",
+    'script',
+    'noscript',
+    'style',
+    'nav',
+    'footer',
+    '.ads',
+    '.sidebar',
+    '.popup',
+    '.cookie-banner',
+    '#ibl-chat-widget-container',
+    '.ibl-chat-bubble',
+    'mentor-ai',
   ];
-  const tempDiv = document.createElement("div");
+  const tempDiv = document.createElement('div');
 
   selectorsToRemove.forEach((selector: string) => {
     tempDiv.innerHTML = element;
     const elements: NodeListOf<Element> = tempDiv.querySelectorAll(selector);
     elements.forEach((el: Element) => el.remove());
   });
-  return tempDiv.innerHTML.replace(/\n/g, ""); // Remove newline characters
+  return tempDiv.innerHTML.replace(/\n/g, ''); // Remove newline characters
 };
 
 const workerBlob = new Blob(
@@ -84,52 +86,44 @@ const workerBlob = new Blob(
     }
     `,
   ],
-  { type: "application/javascript" }
+  { type: 'application/javascript' }
 );
 
 // Create an object URL for the Blob
 export const workerUrl = URL.createObjectURL(workerBlob);
 
-export const getParamsFromComponent = (
-  component:
-    | "chat"
-    | "analytics-overview"
-    | "analytics-users"
-    | "analytics-topics"
-    | "prompt-gallery"
-    | null
-) => {
+export const getParamsFromComponent = (component: Component | null) => {
   if (
     [
-      "chat",
-      "analytics-overview",
-      "analytics-users",
-      "analytics-topics",
-      "prompt-gallery",
-    ].includes(component ?? "")
+      'chat',
+      'analytics-overview',
+      'analytics-users',
+      'analytics-topics',
+      'prompt-gallery',
+      'explore',
+    ].includes(component ?? '')
   ) {
     return `&hide_side_nav=true&hide_header=true&component=${component}`;
   }
-  return "";
+  else if (component === 'recent-messages') {
+    return `&hide_header=true&component=${component}`;
+  }
+  return '';
 };
 
-export const getUrlFromComponent = (
-  component:
-    | "chat"
-    | "analytics-overview"
-    | "analytics-users"
-    | "analytics-topics"
-    | "prompt-gallery"
-    | null
-) => {
+export const getUrlFromComponent = (component: Component | null) => {
   switch (component) {
-    case "analytics-overview":
-      return "/analytics";
-    case "analytics-users":
-      return "/analytics/users";
-    case "analytics-topics":
-      return "/analytics/topics";
+    case 'analytics-overview':
+      return '/analytics';
+    case 'analytics-users':
+      return '/analytics/users';
+    case 'analytics-topics':
+      return '/analytics/topics';
+    case 'prompt-gallery':
+      return '/prompt-gallery';
+    case 'explore':
+      return '/explore';
     default:
-      return "";
+      return '';
   }
 };
