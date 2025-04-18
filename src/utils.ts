@@ -111,16 +111,16 @@ export const getParamsFromComponent = (component: Component | null) => {
   return '';
 };
 
-export const getUrlFromComponent = (component: Component | null) => {
+export const getUrlFromComponent = (component: Component | null, mentor: string | null, ) => {
   switch (component) {
     case 'analytics-overview':
-      return '/analytics';
+      return `/${mentor}/analytics`;
     case 'analytics-users':
-      return '/analytics/users';
+      return `/${mentor}/analytics/users`;
     case 'analytics-topics':
-      return '/analytics/topics';
+      return `/${mentor}/analytics/topics`;
     case 'prompt-gallery':
-      return '/prompt-gallery';
+      return `/${mentor}/prompt-gallery`;
     case 'explore':
       return '/explore';
     default:

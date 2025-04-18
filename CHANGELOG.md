@@ -1,3 +1,7 @@
+[1.2.2]
+
+- adds mentor prop to the `getUrlFromComponent` function
+
 [1.2.1]
 
 - adds recent-messages iframe
