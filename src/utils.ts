@@ -124,6 +124,6 @@ export const getUrlFromComponent = (component: Component | null, mentor: string 
     case 'explore':
       return '/explore';
     default:
-      return '';
+      return `/${mentor}`;
   }
 };
