@@ -1,3 +1,7 @@
+[1.2.3]
+
+- add mentor as default for `getUrlFromComponent` function
+
 [1.2.2]
 
 - adds mentor prop to the `getUrlFromComponent` function
