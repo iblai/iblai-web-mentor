@@ -418,7 +418,7 @@ export default class MentorAI extends HTMLElement {
       if (this.shadowRoot && iframe) {
         iframe.src = `${this.mentorUrl}/platform/${
           this.tenant
-        }/${getUrlFromComponent(this.component, this.mentor)}/${
+        }${getUrlFromComponent(this.component, this.mentor)}/${
           this.modal ? this.modal : ''
         }?embed=true&mode=anonymous&extra-body-classes=iframed-externally${
           this.isAdvanced ? '&chat=advanced' : ''
