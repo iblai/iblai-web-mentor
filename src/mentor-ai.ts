@@ -1,3 +1,5 @@
+/// <reference types="react" />
+
 export interface MentorAIElement extends HTMLElement {
   mentorUrl?: string;
   authUrl?: string;
@@ -14,10 +16,12 @@ export interface MentorAIElement extends HTMLElement {
   modal?: string;
   component: string;
 }
+
 declare global {
   interface HTMLElementTagNameMap {
     "mentor-ai": MentorAIElement;
   }
+
   namespace JSX {
     interface IntrinsicElements {
       "mentor-ai": Partial<MentorAIElement> &

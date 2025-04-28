@@ -5,12 +5,11 @@
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "declaration": true,
-    "typeRoots": ["./node_modules/@types", "./mentor-ai.d.ts"],
+    "emitDeclarationOnly": false,
+    "declarationDir": "dist/types",
     "strict": true,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "types": ["react"]
   },
-  "include": [
-    "src/**/*", // Adjust this path as necessary
-    "mentor-ai.d.ts"
-  ]
+  "include": ["src/**/*"]
 }

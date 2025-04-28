@@ -28,6 +28,7 @@ export default {
     resolve(), // Resolve node_modules
     commonjs(), // Support CommonJS modules
     typescript({
+      useTsconfigDeclarationDir: true,
       tsconfig: "./tsconfig.json", // Path to your TypeScript config
     }),
     babel({

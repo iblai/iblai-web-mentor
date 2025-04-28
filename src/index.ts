@@ -559,3 +559,5 @@ function defineMentorAI() {
 }
 
 defineMentorAI();
+
+export * from "./mentor-ai";
