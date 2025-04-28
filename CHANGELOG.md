@@ -1,3 +1,7 @@
+[1.2.5]
+
+- adds types.d.ts
+
 [1.2.4]
 
 - adds strong typing for typescript compartibility with consuming projects

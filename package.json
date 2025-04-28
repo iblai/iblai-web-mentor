@@ -1,6 +1,6 @@
 {
   "name": "@iblai/iblai-web-mentor",
-  "version": "1.2.4",
+  "version": "1.2.5",
   "type": "module",
   "description": "IBL AI Mentor",
   "main": "dist/iblai-web-mentor.esm.js",
@@ -9,7 +9,9 @@
   },
   "files": [
     "dist",
-    "src"
+    "src",
+    "README.md",
+    "types.d.ts"
   ],
   "exports": {
     ".": {
@@ -17,7 +19,7 @@
       "require": "./dist/iblai-web-mentor.cjs.js"
     }
   },
-  "types": "dist/types/mentor-ai.d.ts",
+  "types": "./types.d.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "rollup -c"

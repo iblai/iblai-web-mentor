@@ -1,6 +1,8 @@
 /// <reference types="react" />
 
-export interface MentorAIElement extends HTMLElement {
+import { Theme } from "./models";
+
+export interface MentorAIProps extends HTMLElement {
   mentorUrl?: string;
   authUrl?: string;
   lmsUrl?: string;
@@ -19,13 +21,12 @@ export interface MentorAIElement extends HTMLElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    "mentor-ai": MentorAIElement;
+    "mentor-ai": MentorAIProps;
   }
 
   namespace JSX {
     interface IntrinsicElements {
-      "mentor-ai": Partial<MentorAIElement> &
-        React.HTMLAttributes<MentorAIElement>;
+      "mentor-ai": Partial<MentorAIProps> & React.HTMLAttributes<MentorAIProps>;
     }
   }
 }
