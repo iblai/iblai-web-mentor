@@ -2,31 +2,32 @@ import {
   cleanElement,
   getParamsFromComponent,
   getUrlFromComponent,
-} from "./utils";
-import { fetchUserTenants, fetchUserTokens } from "./api";
+} from './utils';
+import { fetchUserTenants, fetchUserTokens } from './api';
+import { Theme } from './models';
 
 export {
   sendHTMLContentToHost,
   sendHTMLContentToIframe,
   proxyContextPostMessage,
-} from "./context-share";
+} from './context-share';
 
 export default class MentorAI extends HTMLElement {
   isEmbeddedMentorReady: boolean = false;
-  iblData: string = "";
+  iblData: string = '';
   // Keeps track of the hosts' page URL
-  lastUrl: string = "";
+  lastUrl: string = '';
   private iframeContexts: { [key: string]: string } = {}; // Object to keep track of iframe contexts
 
   constructor() {
     super();
     const _iblData: string | null = new URL(
       window.location.href
-    ).searchParams.get("ibl-data");
+    ).searchParams.get('ibl-data');
     if (_iblData) {
       this.iblData = _iblData;
     }
-    this.attachShadow({ mode: "open" });
+    this.attachShadow({ mode: 'open' });
 
     const template = `
     <style>
@@ -84,7 +85,7 @@ export default class MentorAI extends HTMLElement {
 
   async onPostMessage(event: MessageEvent) {
     let message: any = event.data;
-    if (typeof message === "string") {
+    if (typeof message === 'string') {
       try {
         message = JSON.parse(message);
       } catch (error) {
@@ -93,7 +94,7 @@ export default class MentorAI extends HTMLElement {
     }
 
     // New context handling
-    if (message?.type === "context") {
+    if (message?.type === 'context') {
       const origin = event.origin; // Get the origin of the iframe
       if (this.contextOrigins.includes(origin)) {
         // Check if the origin is whitelisted
@@ -104,7 +105,7 @@ export default class MentorAI extends HTMLElement {
     // New height handling
     if (message?.height) {
       const container = this.shadowRoot?.querySelector(
-        "#ibl-chat-widget-container"
+        '#ibl-chat-widget-container'
       ) as HTMLElement;
       if (container) {
         container.style.height = `${message.height}px`; // Set the height based on the message
@@ -182,7 +183,7 @@ export default class MentorAI extends HTMLElement {
             }
           }
         } catch (error) {
-          console.error("Error parsing userData from auth:", error);
+          console.error('Error parsing userData from auth:', error);
         }
       }
     }
@@ -217,211 +218,211 @@ export default class MentorAI extends HTMLElement {
   connectedCallback() {
     if (this.iblData) {
       const url = new URL(window.location.href);
-      url.searchParams.delete("ibl-data");
+      url.searchParams.delete('ibl-data');
       window.history.replaceState({}, document.title, url);
       const userData: any = JSON.parse(this.iblData).userData;
       document.cookie = `userData=${userData}; domain=${document.domain}; path=/;`;
     }
 
-    window.addEventListener("message", (event: MessageEvent) =>
+    window.addEventListener('message', (event: MessageEvent) =>
       this.onPostMessage(event)
     );
 
     // Show the spinner when the iframe starts loading
-    const iframe = this.shadowRoot?.querySelector("iframe");
+    const iframe = this.shadowRoot?.querySelector('iframe');
     if (iframe) {
       iframe.onloadstart = () => {
         const spinner = this.shadowRoot?.querySelector(
-          "#loading-spinner"
+          '#loading-spinner'
         ) as HTMLElement;
         if (spinner) {
-          spinner.style.display = "block";
+          spinner.style.display = 'block';
         }
       };
       iframe.onload = () => {
         const spinner = this.shadowRoot?.querySelector(
-          "#loading-spinner"
+          '#loading-spinner'
         ) as HTMLElement;
         if (spinner) {
-          spinner.style.display = "none";
+          spinner.style.display = 'none';
         }
       };
     }
   }
 
   disconnectedCallback() {
-    window.removeEventListener("message", this.onPostMessage);
+    window.removeEventListener('message', this.onPostMessage);
   }
 
   get mentorUrl() {
-    return this.getAttribute("mentorurl") || "https://mentor.iblai.app";
+    return this.getAttribute('mentorurl') || 'https://mentor.iblai.app';
   }
 
   set mentorUrl(value) {
-    this.setAttribute("mentorurl", value);
+    this.setAttribute('mentorurl', value);
   }
 
   get authUrl() {
-    return this.getAttribute("authurl") || "https://auth.iblai.app";
+    return this.getAttribute('authurl') || 'https://auth.iblai.app';
   }
 
   set authUrl(value) {
-    this.setAttribute("authurl", value);
+    this.setAttribute('authurl', value);
   }
 
   get lmsUrl() {
-    return this.getAttribute("lmsurl") || "https://learn.iblai.app";
+    return this.getAttribute('lmsurl') || 'https://learn.iblai.app';
   }
 
   set lmsUrl(value) {
-    this.setAttribute("lmsurl", value);
+    this.setAttribute('lmsurl', value);
   }
 
   get theme(): Theme {
-    return (this.getAttribute("theme") as Theme) || "light";
+    return (this.getAttribute('theme') as Theme) || 'light';
   }
 
   set theme(value: Theme) {
-    this.setAttribute("theme", value);
+    this.setAttribute('theme', value);
   }
 
   get tenant(): string | null {
-    return this.getAttribute("tenant");
+    return this.getAttribute('tenant');
   }
 
   set tenant(value: string) {
-    this.setAttribute("tenant", value);
+    this.setAttribute('tenant', value);
   }
 
   get contextOrigins(): string[] {
-    return this.getAttribute("contextorigins")?.split(",") || [];
+    return this.getAttribute('contextorigins')?.split(',') || [];
   }
 
   set contextOrigins(value: string) {
-    this.setAttribute("contextorigins", value);
+    this.setAttribute('contextorigins', value);
   }
 
   get mentor(): string | null {
-    return this.getAttribute("mentor");
+    return this.getAttribute('mentor');
   }
 
   set mentor(value: string) {
-    this.setAttribute("mentor", value);
+    this.setAttribute('mentor', value);
   }
 
   get edxUserId(): string | null {
-    return this.getAttribute("edxuserid");
+    return this.getAttribute('edxuserid');
   }
 
   set edxUserId(value: string) {
-    this.setAttribute("edxuserid", value);
+    this.setAttribute('edxuserid', value);
   }
 
   get authRelyOnHost() {
-    return this.hasAttribute("authrelyonhost");
+    return this.hasAttribute('authrelyonhost');
   }
 
   set authRelyOnHost(value) {
     if (value) {
-      this.setAttribute("authrelyonhost", "");
+      this.setAttribute('authrelyonhost', '');
     } else {
-      this.removeAttribute("authrelyonhost");
+      this.removeAttribute('authrelyonhost');
     }
   }
 
   get isAnonymous() {
-    return this.hasAttribute("isanonymous");
+    return this.hasAttribute('isanonymous');
   }
 
   set isAnonymous(value) {
     if (value) {
-      this.setAttribute("isanonymous", "");
+      this.setAttribute('isanonymous', '');
     } else {
-      this.removeAttribute("isanonymous");
+      this.removeAttribute('isanonymous');
     }
   }
 
   get isAdvanced() {
-    return this.hasAttribute("isadvanced");
+    return this.hasAttribute('isadvanced');
   }
 
   set isAdvanced(value) {
     if (value) {
-      this.setAttribute("isadvanced", "");
+      this.setAttribute('isadvanced', '');
     } else {
-      this.removeAttribute("isadvanced");
+      this.removeAttribute('isadvanced');
     }
   }
 
   get isContextAware() {
-    return this.hasAttribute("iscontextaware");
+    return this.hasAttribute('iscontextaware');
   }
 
   set isContextAware(value) {
     if (value) {
-      this.setAttribute("iscontextaware", "");
+      this.setAttribute('iscontextaware', '');
     } else {
-      this.removeAttribute("iscontextaware");
+      this.removeAttribute('iscontextaware');
     }
   }
 
   get redirectToken(): string | null {
-    return this.getAttribute("redirecttoken");
+    return this.getAttribute('redirecttoken');
   }
 
   set redirectToken(value: string) {
-    this.setAttribute("redirecttoken", value);
+    this.setAttribute('redirecttoken', value);
   }
 
-  get component(): "chat" | null {
-    return this.getAttribute("component") as "chat" | null;
+  get component(): 'chat' | null {
+    return this.getAttribute('component') as 'chat' | null;
   }
 
   set component(value: string) {
-    this.setAttribute("component", value);
+    this.setAttribute('component', value);
   }
 
-  get modal(): "dataset" | "settings" | null {
-    return this.getAttribute("modal") as "dataset" | "settings" | null;
+  get modal(): 'dataset' | 'settings' | null {
+    return this.getAttribute('modal') as 'dataset' | 'settings' | null;
   }
 
   set modal(value: string) {
-    this.setAttribute("modal", value);
+    this.setAttribute('modal', value);
   }
 
   static get observedAttributes() {
     return [
-      "mentorUrl",
-      "tenant",
-      "mentor",
-      "isadvanced",
-      "iscontextaware",
-      "contextOrigins", // Add the new attribute to observed attributes
-      "component",
-      "modal",
+      'mentorUrl',
+      'tenant',
+      'mentor',
+      'isadvanced',
+      'iscontextaware',
+      'contextOrigins', // Add the new attribute to observed attributes
+      'component',
+      'modal',
     ];
   }
 
   attributeChangedCallback(name: string, oldValue: any, newValue: any) {
     if (
       [
-        "mentorUrl",
-        "tenant",
-        "mentor",
-        "isadvanced",
-        "component",
-        "modal",
+        'mentorUrl',
+        'tenant',
+        'mentor',
+        'isadvanced',
+        'component',
+        'modal',
       ].includes(name)
     ) {
-      const iframe = this.shadowRoot?.querySelector("iframe");
+      const iframe = this.shadowRoot?.querySelector('iframe');
       if (this.shadowRoot && iframe) {
-        iframe.src = `${this.mentorUrl}/platform/${this.tenant}/${
-          this.mentor
-        }${getUrlFromComponent(this.component)}/${
-          this.modal ? this.modal : ""
+        iframe.src = `${this.mentorUrl}/platform/${
+          this.tenant
+        }${getUrlFromComponent(this.component, this.mentor)}/${
+          this.modal ? this.modal : ''
         }?embed=true&mode=anonymous&extra-body-classes=iframed-externally${
-          this.isAdvanced ? "&chat=advanced" : ""
-        }${this.modal ? "&modal=" + this.modal : ""}${getParamsFromComponent(
+          this.isAdvanced ? '&chat=advanced' : ''
+        }${this.modal ? '&modal=' + this.modal : ''}${getParamsFromComponent(
           this.component
         )}`;
       }
@@ -437,10 +438,10 @@ export default class MentorAI extends HTMLElement {
         this.isContextAware && this.sendHostInfoToIframe();
       }, 1000);
     }
-    if (name === "contextOrigins") {
-      this.contextOrigins = newValue?.split(",") || []; // Update the context origins when the attribute changes
+    if (name === 'contextOrigins') {
+      this.contextOrigins = newValue?.split(',') || []; // Update the context origins when the attribute changes
     }
-    if (name === "theme") {
+    if (name === 'theme') {
       this.switchTheme(newValue);
     }
   }
@@ -472,44 +473,44 @@ export default class MentorAI extends HTMLElement {
     );
 
     // Merge bodyClone HTML with cleaned iframe HTMLs
-    const mergedContent = bodyClone.innerHTML + iframeHtmls.join("");
+    const mergedContent = bodyClone.innerHTML + iframeHtmls.join('');
 
     return mergedContent; // Return the merged HTML content
   }
 
   sendHostInfoToIframe() {
     const iframe = this.shadowRoot?.querySelector(
-      "#ibl-chat-widget-container iframe"
+      '#ibl-chat-widget-container iframe'
     ) as HTMLIFrameElement;
     if (iframe && iframe.contentWindow) {
       const bodyContent = this.getCleanBodyContent();
       const payload = {
-        reason: "CONTEXT",
+        reason: 'CONTEXT',
         hostInfo: {
           title: document.title,
           href: window.location.href,
         },
         pageContent: bodyContent,
       };
-      iframe.contentWindow.postMessage(payload, "*");
+      iframe.contentWindow.postMessage(payload, '*');
     }
   }
 
   switchTheme(theme: string) {
     const iframe = this.shadowRoot?.querySelector(
-      "#ibl-chat-widget-container iframe"
+      '#ibl-chat-widget-container iframe'
     ) as HTMLIFrameElement;
     if (iframe && iframe.contentWindow) {
-      iframe.contentWindow.postMessage(JSON.stringify({ theme }), "*");
+      iframe.contentWindow.postMessage(JSON.stringify({ theme }), '*');
     }
   }
 
   sendAuthDataToIframe(iblData: any) {
     const iframe = this.shadowRoot?.querySelector(
-      "#ibl-chat-widget-container iframe"
+      '#ibl-chat-widget-container iframe'
     ) as HTMLIFrameElement;
     if (iframe && iframe.contentWindow) {
-      iframe.contentWindow.postMessage(iblData, "*");
+      iframe.contentWindow.postMessage(iblData, '*');
     }
   }
 
@@ -522,10 +523,10 @@ export default class MentorAI extends HTMLElement {
   redirectToAuthSPA(forceLogout?: boolean) {
     if (this.authRelyOnHost) {
       const iframe = this.shadowRoot?.querySelector(
-        "#ibl-chat-widget-container iframe"
+        '#ibl-chat-widget-container iframe'
       ) as HTMLIFrameElement;
       if (iframe && iframe.contentWindow) {
-        iframe.contentWindow.postMessage({ ...localStorage }, "*");
+        iframe.contentWindow.postMessage({ ...localStorage }, '*');
       }
       return;
     }
@@ -534,27 +535,27 @@ export default class MentorAI extends HTMLElement {
     window.location.href = `${
       this.authUrl
     }/login?redirect-path=${redirectPath}&tenant=${this.tenant}${
-      forceLogout ? "&logout=true" : ""
+      forceLogout ? '&logout=true' : ''
     }&redirect-token=${this.redirectToken}`;
   }
 
   toggleWidget() {
     const widget: HTMLElement | null = document.getElementById(
-      "ibl-chat-widget-container"
+      'ibl-chat-widget-container'
     );
     if (widget) {
-      if (widget.style.display === "none") {
-        widget.style.display = "";
+      if (widget.style.display === 'none') {
+        widget.style.display = '';
       } else {
-        widget.style.display = "none";
+        widget.style.display = 'none';
       }
     }
   }
 }
 
 function defineMentorAI() {
-  if (!customElements.get("mentor-ai")) {
-    customElements.define("mentor-ai", MentorAI);
+  if (!customElements.get('mentor-ai')) {
+    customElements.define('mentor-ai', MentorAI);
   }
 }
 

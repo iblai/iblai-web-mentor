@@ -1,3 +1,17 @@
+[1.2.3]
+
+- add mentor as default for `getUrlFromComponent` function
+
+[1.2.2]
+
+- adds mentor prop to the `getUrlFromComponent` function
+
+[1.2.1]
+
+- adds recent-messages iframe
+- adds explore iframe
+- adds prompt-gallery iframe
+
 [1.2.0]
 
 - adds spinner while mentor iframe loads
