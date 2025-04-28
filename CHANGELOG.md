@@ -1,3 +1,7 @@
+[1.2.4]
+
+- adds strong typing for typescript compartibility with consuming projects
+
 [1.2.3]
 
 - add mentor as default for `getUrlFromComponent` function
