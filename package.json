@@ -47,7 +47,6 @@
     "typescript": "^5.7.3"
   },
   "dependencies": {
-    "@iblai/data-layer": "file:../ibl-web-mobile-data-layer/iblai-data-layer-0.0.1.tgz",
     "@rollup/plugin-babel": "^6.0.4",
     "rollup-plugin-typescript2": "^0.36.0"
   }
