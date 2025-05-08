@@ -1,3 +1,7 @@
+[1.3.0]
+
+-adds edxusageid and edxcourseid props and pass down to mentor
+
 [1.2.5]
 
 - adds types.d.ts
