@@ -1,3 +1,7 @@
+[1.3.1]
+
+- removes data layer dependency
+
 [1.3.0]
 
 -adds edxusageid and edxcourseid props and pass down to mentor
