@@ -4,19 +4,26 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Mentor AI Page</title>
-    <script src="../dist/iblai-web-mentor.umd.js"></script>
+
+    <script
+      src="https://mentor-ai.s3.us-east-1.amazonaws.com/iblai-web-mentor.umd.js?versionId=MkmsXoNwzVZb.9_pBCTnUmNIrXqM6Yg9"
+      type="application/javascript"
+    ></script>
   </head>
   <body style="height: 100vh; width: 100%; margin: 0">
     <mentor-ai
-      mentorUrl="http://localhost:3001"
+      mentorUrl="http://localhost:3002"
       authUrl="http://localhost:3000"
       tenant="gillis1"
       lmsUrl="https://learn.iblai.tech"
-      mentor="ai-job-scout-assistant"
+      mentor="ai-jobscout-assistant"
       redirectToken="2007d5b0-ebd6-4f9f-82cd-78d8566f2c73"
       contextOrigins="http://localhost:3002,http://localhost:55477"
       isContextAware
       theme="light"
+      edxUsageId="34184882"
+      edxCourseId="course-v1:ibl:introduction-to-programming"
+      isAnonymous
     ></mentor-ai>
     <!-- <iframe
       style="width: 80vw; height: 90vh"

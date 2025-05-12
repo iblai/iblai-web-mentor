@@ -213,6 +213,7 @@ export default class MentorAI extends HTMLElement {
       if (this.theme) {
         this.switchTheme(this.theme);
       }
+
       if (this.edxUsageId) {
         this.sendDataToIframe({
           type: "EDX_USAGE_ID",
