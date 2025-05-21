@@ -1,6 +1,6 @@
 {
   "name": "@iblai/iblai-web-mentor",
-  "version": "1.3.2",
+  "version": "1.3.3",
   "type": "module",
   "description": "IBL AI Mentor",
   "main": "dist/iblai-web-mentor.esm.js",
