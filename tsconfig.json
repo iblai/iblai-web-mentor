@@ -9,7 +9,7 @@
     "declarationDir": "dist/types",
     "strict": true,
     "skipLibCheck": true,
-    "types": ["react"]
+    "types": ["./types.d.ts", "react"]
   },
-  "include": ["src/**/*"]
+  "include": ["src/**/*", "types.d.ts"]
 }

@@ -592,7 +592,7 @@ export default class MentorAI extends HTMLElement {
 }
 
 function defineMentorAI() {
-  if (!customElements.get("mentor-ai")) {
+  if (typeof window !== "undefined" && !customElements.get("mentor-ai")) {
     customElements.define("mentor-ai", MentorAI);
   }
 }

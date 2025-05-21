@@ -1,28 +1,28 @@
-import { Component } from './models';
+import { Component } from "./models";
 
 export const cleanElement = (element: string) => {
   const selectorsToRemove: string[] = [
-    'script',
-    'noscript',
-    'style',
-    'nav',
-    'footer',
-    '.ads',
-    '.sidebar',
-    '.popup',
-    '.cookie-banner',
-    '#ibl-chat-widget-container',
-    '.ibl-chat-bubble',
-    'mentor-ai',
+    "script",
+    "noscript",
+    "style",
+    "nav",
+    "footer",
+    ".ads",
+    ".sidebar",
+    ".popup",
+    ".cookie-banner",
+    "#ibl-chat-widget-container",
+    ".ibl-chat-bubble",
+    "mentor-ai",
   ];
-  const tempDiv = document.createElement('div');
+  const tempDiv = document.createElement("div");
 
   selectorsToRemove.forEach((selector: string) => {
     tempDiv.innerHTML = element;
     const elements: NodeListOf<Element> = tempDiv.querySelectorAll(selector);
     elements.forEach((el: Element) => el.remove());
   });
-  return tempDiv.innerHTML.replace(/\n/g, ''); // Remove newline characters
+  return tempDiv.innerHTML.replace(/\n/g, ""); // Remove newline characters
 };
 
 const workerBlob = new Blob(
@@ -86,7 +86,7 @@ const workerBlob = new Blob(
     }
     `,
   ],
-  { type: 'application/javascript' }
+  { type: "application/javascript" }
 );
 
 // Create an object URL for the Blob
@@ -95,34 +95,35 @@ export const workerUrl = URL.createObjectURL(workerBlob);
 export const getParamsFromComponent = (component: Component | null) => {
   if (
     [
-      'chat',
-      'analytics-overview',
-      'analytics-users',
-      'analytics-topics',
-      'prompt-gallery',
-      'explore',
-    ].includes(component ?? '')
+      "analytics-overview",
+      "analytics-users",
+      "analytics-topics",
+      "prompt-gallery",
+      "explore",
+    ].includes(component ?? "")
   ) {
     return `&hide_side_nav=true&hide_header=true&component=${component}`;
-  }
-  else if (component === 'recent-messages') {
+  } else if (component === "recent-messages") {
     return `&hide_header=true&component=${component}`;
   }
-  return '';
+  return `&component=${component}`;
 };
 
-export const getUrlFromComponent = (component: Component | null, mentor: string | null, ) => {
+export const getUrlFromComponent = (
+  component: Component | null,
+  mentor: string | null
+) => {
   switch (component) {
-    case 'analytics-overview':
+    case "analytics-overview":
       return `/${mentor}/analytics`;
-    case 'analytics-users':
+    case "analytics-users":
       return `/${mentor}/analytics/users`;
-    case 'analytics-topics':
+    case "analytics-topics":
       return `/${mentor}/analytics/topics`;
-    case 'prompt-gallery':
+    case "prompt-gallery":
       return `/${mentor}/prompt-gallery`;
-    case 'explore':
-      return '/explore';
+    case "explore":
+      return "/explore";
     default:
       return `/${mentor}`;
   }
