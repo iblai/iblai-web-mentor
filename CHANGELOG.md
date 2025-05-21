@@ -1,3 +1,7 @@
+[1.3.4]
+
+-adds extraparams prop
+
 [1.3.3]
 
 - fix: chat component should not hide header and side nav
