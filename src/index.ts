@@ -307,6 +307,14 @@ export default class MentorAI extends HTMLElement {
     this.setAttribute("tenant", value);
   }
 
+  get extraParams(): string | null {
+    return this.getAttribute("extraparams");
+  }
+
+  set extraParams(value: string) {
+    this.setAttribute("extraparams", value);
+  }
+
   get contextOrigins(): string[] {
     return this.getAttribute("contextorigins")?.split(",") || [];
   }
@@ -429,6 +437,7 @@ export default class MentorAI extends HTMLElement {
       "contextOrigins", // Add the new attribute to observed attributes
       "component",
       "modal",
+      "extraparams",
     ];
   }
 
@@ -441,6 +450,7 @@ export default class MentorAI extends HTMLElement {
         "isadvanced",
         "component",
         "modal",
+        "extraparams",
       ].includes(name)
     ) {
       const iframe = this.shadowRoot?.querySelector("iframe");
@@ -453,7 +463,7 @@ export default class MentorAI extends HTMLElement {
           this.isAdvanced ? "&chat=advanced" : ""
         }${this.modal ? "&modal=" + this.modal : ""}${getParamsFromComponent(
           this.component
-        )}`;
+        )}${this.extraParams ? "&" + this.extraParams : ""}`;
       }
     }
     if (this.isContextAware) {
