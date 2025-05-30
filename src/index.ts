@@ -102,6 +102,10 @@ export default class MentorAI extends HTMLElement {
       }
     }
 
+    if (message?.closeEmbed) {
+      window.parent.postMessage(JSON.stringify(message), "*");
+    }
+
     // New height handling
     if (message?.height) {
       const container = this.shadowRoot?.querySelector(
