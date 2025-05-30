@@ -1,3 +1,7 @@
+[1.3.5]
+
+- forward message about closing embed to parent window
+
 [1.3.4]
 
 -adds extraparams prop
