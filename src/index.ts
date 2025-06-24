@@ -218,6 +218,10 @@ export default class MentorAI extends HTMLElement {
         this.switchTheme(this.theme);
       }
 
+      if (this.documentFilter) {
+        this.sendDocumentFilterToIframe();
+      }
+
       if (this.edxUsageId) {
         this.sendDataToIframe({
           type: "EDX_USAGE_ID",
@@ -431,6 +435,14 @@ export default class MentorAI extends HTMLElement {
     this.setAttribute("modal", value);
   }
 
+  get documentFilter(): string | null {
+    return this.getAttribute("documentfilter") as string | null;
+  }
+
+  set documentFilter(value: string) {
+    this.setAttribute("documentfilter", value);
+  }
+
   static get observedAttributes() {
     return [
       "mentorUrl",
@@ -442,6 +454,7 @@ export default class MentorAI extends HTMLElement {
       "component",
       "modal",
       "extraparams",
+      "documentfilter",
     ];
   }
 
@@ -480,6 +493,9 @@ export default class MentorAI extends HTMLElement {
         // }
         this.isContextAware && this.sendHostInfoToIframe();
       }, 1000);
+    }
+    if (this.documentFilter) {
+      this.sendDocumentFilterToIframe();
     }
     if (name === "contextOrigins") {
       this.contextOrigins = newValue?.split(",") || []; // Update the context origins when the attribute changes
@@ -537,6 +553,13 @@ export default class MentorAI extends HTMLElement {
       };
       iframe.contentWindow.postMessage(payload, "*");
     }
+  }
+
+  sendDocumentFilterToIframe() {
+    this.sendDataToIframe({
+      type: "DOCUMENTFILTER",
+      data: this.documentFilter,
+    });
   }
 
   sendDataToIframe(data: Record<string, any>) {
