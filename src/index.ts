@@ -224,13 +224,13 @@ export default class MentorAI extends HTMLElement {
 
       if (this.edxUsageId) {
         this.sendDataToIframe({
-          type: "EDX_USAGE_ID",
+          type: "MENTOR:EDX_USAGE_ID",
           data: { edxUsageId: this.edxUsageId },
         });
       }
       if (this.edxCourseId) {
         this.sendDataToIframe({
-          type: "EDX_COURSE_ID",
+          type: "MENTOR:EDX_COURSE_ID",
           data: { edxCourseId: this.edxCourseId },
         });
       }
@@ -544,7 +544,7 @@ export default class MentorAI extends HTMLElement {
     if (iframe && iframe.contentWindow) {
       const bodyContent = this.getCleanBodyContent();
       const payload = {
-        reason: "CONTEXT",
+        type: "MENTOR:CONTEXT_UPDATE",
         hostInfo: {
           title: document.title,
           href: window.location.href,
@@ -557,7 +557,7 @@ export default class MentorAI extends HTMLElement {
 
   sendDocumentFilterToIframe() {
     this.sendDataToIframe({
-      type: "DOCUMENTFILTER",
+      type: "MENTOR:DOCUMENTFILTER",
       data: this.documentFilter,
     });
   }
