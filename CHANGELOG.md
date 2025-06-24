@@ -1,3 +1,8 @@
+[1.3.6]
+
+- adds documentfilter prop
+- send documentfilter to mentor on attribute change or when mentor is loaded
+
 [1.3.5]
 
 - forward message about closing embed to parent window
