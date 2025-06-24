@@ -1,3 +1,8 @@
+[2.0.0]
+
+- prefix all post message types with MENTOR:
+- Compartible with the new IBL NEXTJS MENTORAI
+
 [1.3.6]
 
 - adds documentfilter prop
