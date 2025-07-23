@@ -93,6 +93,7 @@ const workerBlob = new Blob(
 export const workerUrl = URL.createObjectURL(workerBlob);
 
 export const getParamsFromComponent = (component: Component | null) => {
+  if (!component) return "";
   if (
     [
       "analytics-overview",
