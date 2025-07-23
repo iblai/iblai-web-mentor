@@ -1,3 +1,7 @@
+[2.0.1]
+
+- don't pass the component param when component passed to getParamsComponent function is undefined or null
+
 [2.0.0]
 
 - prefix all post message types with MENTOR:
