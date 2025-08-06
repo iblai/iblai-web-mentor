@@ -117,14 +117,7 @@ export default class MentorAI extends HTMLElement {
     }
 
     if (!this.isAnonymous) {
-      if (
-        message?.loaded &&
-        (!message.auth.axd_token ||
-          !message.auth.dm_token ||
-          message.auth.tenant !== this.tenant ||
-          this.isTokenExpired(message.auth.dm_token_expires) ||
-          this.isTokenExpired(message.auth.axd_token_expires))
-      ) {
+      if (message?.authExpired) {
         try {
           const userTenants = await fetchUserTenants(this.lmsUrl);
 
@@ -147,8 +140,10 @@ export default class MentorAI extends HTMLElement {
             };
             this.sendAuthDataToIframe(userObject);
           }
-        } catch (error) {}
-        !this.iblData && this.redirectToAuthSPA();
+        } catch (error) {
+          console.error("Error fetching user tenants or tokens:", error);
+          !this.iblData && this.redirectToAuthSPA();
+        }
       }
 
       if (message?.loaded && message.auth.userData) {
@@ -191,15 +186,7 @@ export default class MentorAI extends HTMLElement {
         }
       }
     }
-    if (message?.authExpired) {
-      if (!this.isAnonymous) {
-        if (this.iblData) {
-          this.sendAuthDataToIframe(this.iblData);
-        } else {
-          this.redirectToAuthSPA(true);
-        }
-      }
-    } else if (message?.ready) {
+    if (message?.ready) {
       this.isEmbeddedMentorReady = true;
       if (this.iblData) {
         this.sendAuthDataToIframe(this.iblData);
