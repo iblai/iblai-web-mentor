@@ -1,3 +1,7 @@
+[2.1.0]
+
+- only try to fetch user data when receive message of authExpired
+
 [2.0.1]
 
 - don't pass the component param when component passed to getParamsComponent function is undefined or null
