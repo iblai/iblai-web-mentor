@@ -88,7 +88,8 @@
             "https://mentor.iblai.org/platform/main/ai-mentor-new-templating?embed=true&extra-body-classes=iframed-externally";
           iframe.style =
             "border: 0px white; height:100%;width:100%;border-radius: 0;";
-          iframe.allow = "clipboard-read; clipboard-write";
+          iframe.allow =
+            "clipboard-read; clipboard-write; microphone *; camera *; midi *; geolocation *; encrypted-media *";
 
           iframeContainer.appendChild(iframe);
           document.body.appendChild(iframeContainer);
