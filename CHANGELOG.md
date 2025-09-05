@@ -1,3 +1,7 @@
+[2.1.1]
+
+- chore: adds microphone _; camera _; midi _; geolocation _; encrypted-media \* to iframe allow attributes
+
 [2.1.0]
 
 - only try to fetch user data when receive message of authExpired
