@@ -1,3 +1,7 @@
+[2.1.2]
+
+- chore: adds display-capture * to iframe allow attributes
+
 [2.1.1]
 
 - chore: adds microphone _; camera _; midi _; geolocation _; encrypted-media \* to iframe allow attributes
