@@ -72,7 +72,7 @@ export default class MentorAI extends HTMLElement {
     <div id="ibl-chat-widget-container">
         <div class="spinner" id="loading-spinner"></div>
         <iframe
-          allow="clipboard-read; clipboard-write; microphone *; camera *; midi *; geolocation *; encrypted-media *"
+          allow="clipboard-read; clipboard-write; microphone *; camera *; midi *; geolocation *; encrypted-media *; display-capture *"
           onload="this.parentNode.querySelector('#loading-spinner').style.display='none';"
           onloadstart="this.parentNode.querySelector('#loading-spinner').style.display='block';"
         ></iframe>
