@@ -1,6 +1,11 @@
+[2.2.0]
+
+- feat: implement voice call and screensharing opening in another tab if enabled
+- fix: 401 on getting user platforms now triggering redirect to auth SPA
+
 [2.1.2]
 
-- chore: adds display-capture * to iframe allow attributes
+- chore: adds display-capture \* to iframe allow attributes
 
 [2.1.1]
 
