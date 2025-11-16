@@ -17,9 +17,18 @@ export interface ITenant {
   username: string;
 }
 
-export async function fetchUserTenants(lmsUrl: string): Promise<ITenant[]> {
+export async function fetchUserTenants(
+  lmsUrl: string,
+  edxJwtToken?: string
+): Promise<ITenant[]> {
+  const headers: HeadersInit = {};
+  if (edxJwtToken) {
+    headers["Authorization"] = `JWT ${edxJwtToken}`;
+  }
+
   const response = await fetch(`${lmsUrl}/api/ibl/users/manage/platform/`, {
     credentials: "include",
+    headers,
   });
   if (!response.ok) {
     throw new Error("Network response was not ok");
@@ -28,15 +37,25 @@ export async function fetchUserTenants(lmsUrl: string): Promise<ITenant[]> {
   return data;
 }
 
-export async function fetchUserTokens(lmsUrl: string, platformKey: string) {
+export async function fetchUserTokens(
+  lmsUrl: string,
+  platformKey: string,
+  edxJwtToken?: string
+) {
   const formData = new FormData();
   formData.append("platform_key", platformKey);
+
+  const headers: HeadersInit = {};
+  if (edxJwtToken) {
+    headers["Authorization"] = `JWT ${edxJwtToken}`;
+  }
 
   const response = await fetch(
     `${lmsUrl}/api/ibl/manager/consolidated-token/proxy/`,
     {
       method: "POST",
       credentials: "include",
+      headers,
       body: formData,
     }
   );

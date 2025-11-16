@@ -102,6 +102,53 @@ export default class MentorAI extends HTMLElement {
       }
     }
 
+    // Handle voice call action
+    if (
+      message?.type === "MENTOR:CHAT_ACTION_VOICECALL" ||
+      message?.type === "MENTOR:CHAT_ACTION_SCREENSHARE"
+    ) {
+      const iframe = this.shadowRoot?.querySelector("iframe");
+      if (iframe && iframe.src) {
+        let chatAction = "";
+        if (message?.type === "MENTOR:CHAT_ACTION_VOICECALL") {
+          chatAction = "voice-call";
+        } else if (message?.type === "MENTOR:CHAT_ACTION_SCREENSHARE") {
+          chatAction = "screen-share";
+        }
+
+        const url = `${iframe.src}&ibl-data=${this.iblData}&chat-action=${chatAction}`;
+
+        // Check if running inside an iframe
+        if (this.isInIframe()) {
+          // Send message to parent to open the window
+          window.parent.postMessage(
+            {
+              type: "ACTION:OPEN_NEW_WINDOW",
+              payload: { url },
+            },
+            "*"
+          );
+        } else {
+          // Mobile-size window dimensions
+          const width = 375;
+          const height = 667;
+          const left = (window.screen.width - width) / 2;
+          const top = (window.screen.height - height) / 2;
+
+          const popup = window.open(
+            url,
+            "MentorAI",
+            `width=${width},height=${height},left=${left},top=${top},toolbar=no,location=no,directories=no,status=no,menubar=no,resizable=yes,scrollbars=yes`
+          );
+
+          // Ensure the popup is focused and on top
+          if (popup) {
+            popup.focus();
+          }
+        }
+      }
+    }
+
     if (message?.closeEmbed) {
       window.parent.postMessage(JSON.stringify(message), "*");
     }
@@ -119,21 +166,23 @@ export default class MentorAI extends HTMLElement {
     if (!this.isAnonymous) {
       if (message?.authExpired) {
         try {
-          const userTenants = await fetchUserTenants(this.lmsUrl);
-
+          const edxJwtToken = this.getEdxJwtToken();
+          const userTenants = await fetchUserTenants(this.lmsUrl, edxJwtToken);
           const selectedTenant = userTenants.find(
             (tenant) => tenant.key === this.tenant
           );
           if (selectedTenant) {
             const userTokens = await fetchUserTokens(
               this.lmsUrl,
-              selectedTenant.key
+              selectedTenant.key,
+              edxJwtToken
             );
             const userObject = {
               axd_token: userTokens.axd_token.token,
               axd_token_expires: userTokens.axd_token.expires,
               userData: JSON.stringify(userTokens.user),
               dm_token_expires: userTokens.dm_token.expires,
+              edx_jwt_token: edxJwtToken,
               tenant: selectedTenant.key,
               tenants: JSON.stringify(userTenants),
               dm_token: userTokens.dm_token.token,
@@ -142,7 +191,7 @@ export default class MentorAI extends HTMLElement {
           }
         } catch (error) {
           console.error("Error fetching user tenants or tokens:", error);
-          !this.iblData && this.redirectToAuthSPA();
+          this.redirectToAuthSPA();
         }
       }
 
@@ -157,7 +206,11 @@ export default class MentorAI extends HTMLElement {
               this.sendAuthDataToIframe(this.iblData);
             } else {
               try {
-                const userTenants = await fetchUserTenants(this.lmsUrl);
+                const edxJwtToken = this.getEdxJwtToken();
+                const userTenants = await fetchUserTenants(
+                  this.lmsUrl,
+                  edxJwtToken
+                );
 
                 const selectedTenant = userTenants.find(
                   (tenant) => tenant.key === this.tenant
@@ -165,20 +218,24 @@ export default class MentorAI extends HTMLElement {
                 if (selectedTenant) {
                   const userTokens = await fetchUserTokens(
                     this.lmsUrl,
-                    selectedTenant.key
+                    selectedTenant.key,
+                    edxJwtToken
                   );
                   const userObject = {
                     axd_token: userTokens.axd_token.token,
                     axd_token_expires: userTokens.axd_token.expires,
                     userData: JSON.stringify(userTokens.user),
                     dm_token_expires: userTokens.dm_token.expires,
+                    edx_jwt_token: edxJwtToken,
                     tenant: selectedTenant.key,
                     tenants: JSON.stringify(userTenants),
                     dm_token: userTokens.dm_token.token,
                   };
                   this.sendAuthDataToIframe(userObject);
                 }
-              } catch (error) {}
+              } catch (error) {
+                this.redirectToAuthSPA();
+              }
             }
           }
         } catch (error) {
@@ -207,6 +264,12 @@ export default class MentorAI extends HTMLElement {
 
       if (this.documentFilter) {
         this.sendDocumentFilterToIframe();
+      }
+      if (this.enableChatActionPopup) {
+        this.sendDataToIframe({
+          type: "MENTOR:ENABLE_CHAT_ACTION_POPUPS",
+          payload: { enable: true },
+        });
       }
 
       if (this.edxUsageId) {
@@ -398,6 +461,18 @@ export default class MentorAI extends HTMLElement {
     }
   }
 
+  get enableChatActionPopup() {
+    return this.hasAttribute("enablechatactionpopup");
+  }
+
+  set enableChatActionPopup(value) {
+    if (value) {
+      this.setAttribute("enablechatactionpopup", "");
+    } else {
+      this.removeAttribute("enablechatactionpopup");
+    }
+  }
+
   get redirectToken(): string | null {
     return this.getAttribute("redirecttoken");
   }
@@ -437,6 +512,7 @@ export default class MentorAI extends HTMLElement {
       "mentor",
       "isadvanced",
       "iscontextaware",
+      "enablechatactionpopup",
       "contextOrigins", // Add the new attribute to observed attributes
       "component",
       "modal",
@@ -540,6 +616,27 @@ export default class MentorAI extends HTMLElement {
       };
       iframe.contentWindow.postMessage(payload, "*");
     }
+  }
+
+  isInIframe(): boolean {
+    try {
+      return window.self !== window.top;
+    } catch (e) {
+      return true;
+    }
+  }
+
+  getEdxJwtToken(): string | undefined {
+    if (this.iblData) {
+      try {
+        const parsedData = JSON.parse(this.iblData);
+        return parsedData.edx_jwt_token;
+      } catch (error) {
+        console.error("Error parsing iblData:", error);
+        return undefined;
+      }
+    }
+    return undefined;
   }
 
   sendDocumentFilterToIframe() {
