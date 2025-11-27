@@ -1,3 +1,7 @@
+[2.2.1]
+
+- feat: trigger chat action popup with user data in url
+
 [2.2.0]
 
 - feat: implement voice call and screensharing opening in another tab if enabled
