@@ -121,7 +121,12 @@ export default class MentorAI extends HTMLElement {
         let iblDataParam = this.iblData;
         if (!iblDataParam && this.userObject) {
           // Create a copy without the tenants key
-          const { tenants, ...userObjectWithoutTenants } = this.userObject;
+          const userObjectWithoutTenants: any = {};
+          for (const key in this.userObject) {
+            if (key !== "tenants") {
+              userObjectWithoutTenants[key] = this.userObject[key];
+            }
+          }
           iblDataParam = JSON.stringify(userObjectWithoutTenants);
         }
 
