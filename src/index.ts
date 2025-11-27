@@ -18,6 +18,7 @@ export default class MentorAI extends HTMLElement {
   // Keeps track of the hosts' page URL
   lastUrl: string = "";
   private iframeContexts: { [key: string]: string } = {}; // Object to keep track of iframe contexts
+  private userObject: any = null; // Store user object for popup windows
 
   constructor() {
     super();
@@ -116,7 +117,15 @@ export default class MentorAI extends HTMLElement {
           chatAction = "screen-share";
         }
 
-        const url = `${iframe.src}&ibl-data=${this.iblData}&chat-action=${chatAction}`;
+        // Determine the ibl-data to use
+        let iblDataParam = this.iblData;
+        if (!iblDataParam && this.userObject) {
+          // Create a copy without the tenants key
+          const { tenants, ...userObjectWithoutTenants } = this.userObject;
+          iblDataParam = JSON.stringify(userObjectWithoutTenants);
+        }
+
+        const url = `${iframe.src}&ibl-data=${iblDataParam}&chat-action=${chatAction}`;
 
         // Check if running inside an iframe
         if (this.isInIframe()) {
@@ -177,7 +186,7 @@ export default class MentorAI extends HTMLElement {
               selectedTenant.key,
               edxJwtToken
             );
-            const userObject = {
+            this.userObject = {
               axd_token: userTokens.axd_token.token,
               axd_token_expires: userTokens.axd_token.expires,
               userData: JSON.stringify(userTokens.user),
@@ -187,7 +196,7 @@ export default class MentorAI extends HTMLElement {
               tenants: JSON.stringify(userTenants),
               dm_token: userTokens.dm_token.token,
             };
-            this.sendAuthDataToIframe(userObject);
+            this.sendAuthDataToIframe(this.userObject);
           }
         } catch (error) {
           console.error("Error fetching user tenants or tokens:", error);
@@ -221,7 +230,7 @@ export default class MentorAI extends HTMLElement {
                     selectedTenant.key,
                     edxJwtToken
                   );
-                  const userObject = {
+                  this.userObject = {
                     axd_token: userTokens.axd_token.token,
                     axd_token_expires: userTokens.axd_token.expires,
                     userData: JSON.stringify(userTokens.user),
@@ -231,7 +240,7 @@ export default class MentorAI extends HTMLElement {
                     tenants: JSON.stringify(userTenants),
                     dm_token: userTokens.dm_token.token,
                   };
-                  this.sendAuthDataToIframe(userObject);
+                  this.sendAuthDataToIframe(this.userObject);
                 }
               } catch (error) {
                 this.redirectToAuthSPA();

@@ -62,22 +62,23 @@ Include the component directly in your HTML:
 
 ### Attributes
 
-| Attribute      | Description                                                                                                                                         | Type    | Default Value            |
-| -------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- | ------- | ------------------------ |
-| mentorurl      | URL of the MentorAI platform.                                                                                                                       | String  | https://mentor.iblai.app |
-| tenant         | Tenant name for authentication.                                                                                                                     | String  | undefined                |
-| mentor         | Mentor name for the chat widget.                                                                                                                    | String  | undefined                |
-| isanonymous    | Enables anonymous mode. If set, the component will not require user authentication. (Ensure this matches the anonymity of the mentor)               | Boolean | false                    |
-| iscontextaware | Enables context-aware functionality to send page information to the iframe.                                                                         | Boolean | false                    |
-| isadvanced     | Enables advanced chat features.                                                                                                                     | Boolean | false                    |
-| authUrl        | URL for authentication.                                                                                                                             | String  | https://auth.iblai.app   |
-| contextOrigins | Comma separated values indicating the origins whitelisted for sending context. Defaults to an empty string.                                         | String  | ""                       |
-| lmsUrl         | URL for edX LMS.                                                                                                                                    | String  | learn.iblai.app          |
-| authRelyOnHost | Used to determine if to solely depend on the host for authentication and prevent mentor iframe from redirecting to the auth SPA.                    | Boolean | false                    |
-| edxUserId      | Indicates the user id on edX. Optional.                                                                                                             | String  | undefined                |
-| theme          | Sets the theme of the component. Can be either `light` or `dark`.                                                                                   | String  | light                    |
-| component      | Specifies the component to display in the mentor application. Can be one of `analytics-overview`, `analytics-users`, `analytics-topics`, or `chat`. | String  | chat                     |
-| redirectToken  | A token used by the auth layer to redirect back to the equivalent set URL.                                                                          | String  | undefined                |
+| Attribute               | Description                                                                                                                                         | Type    | Default Value            |
+| ----------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- | ------- | ------------------------ |
+| mentorurl               | URL of the MentorAI platform.                                                                                                                       | String  | https://mentor.iblai.app |
+| tenant                  | Tenant name for authentication.                                                                                                                     | String  | undefined                |
+| mentor                  | Mentor name for the chat widget.                                                                                                                    | String  | undefined                |
+| isanonymous             | Enables anonymous mode. If set, the component will not require user authentication. (Ensure this matches the anonymity of the mentor)               | Boolean | false                    |
+| iscontextaware          | Enables context-aware functionality to send page information to the iframe.                                                                         | Boolean | false                    |
+| isadvanced              | Enables advanced chat features.                                                                                                                     | Boolean | false                    |
+| authUrl                 | URL for authentication.                                                                                                                             | String  | https://auth.iblai.app   |
+| contextOrigins          | Comma separated values indicating the origins whitelisted for sending context. Defaults to an empty string.                                         | String  | ""                       |
+| lmsUrl                  | URL for edX LMS.                                                                                                                                    | String  | learn.iblai.app          |
+| authRelyOnHost          | Used to determine if to solely depend on the host for authentication and prevent mentor iframe from redirecting to the auth SPA.                    | Boolean | false                    |
+| edxUserId               | Indicates the user id on edX. Optional.                                                                                                             | String  | undefined                |
+| theme                   | Sets the theme of the component. Can be either `light` or `dark`.                                                                                   | String  | light                    |
+| component               | Specifies the component to display in the mentor application. Can be one of `analytics-overview`, `analytics-users`, `analytics-topics`, or `chat`. | String  | chat                     |
+| redirectToken           | A token used by the auth layer to redirect back to the equivalent set URL.                                                                          | String  | undefined                |
+| enablechatactionpopup   | Enables chat action popups for voice calls and screen sharing. When enabled, sends `MENTOR:ENABLE_CHAT_ACTION_POPUPS` message to the iframe.       | Boolean | false                    |
 
 ## Javascript Frameworks
 
