@@ -12,6 +12,8 @@ export {
   proxyContextPostMessage,
 } from "./context-share";
 
+const POPUP_STORAGE_KEY = "mentor-ai-popup-id";
+
 export default class MentorAI extends HTMLElement {
   isEmbeddedMentorReady: boolean = false;
   iblData: string = "";
@@ -19,6 +21,7 @@ export default class MentorAI extends HTMLElement {
   lastUrl: string = "";
   private iframeContexts: { [key: string]: string } = {}; // Object to keep track of iframe contexts
   private userObject: any = null; // Store user object for popup windows
+  private popupWindow: Window | null = null; // Reference to popup window
 
   constructor() {
     super();
@@ -73,6 +76,7 @@ export default class MentorAI extends HTMLElement {
     <div id="ibl-chat-widget-container">
         <div class="spinner" id="loading-spinner"></div>
         <iframe
+          sandbox="allow-scripts allow-same-origin"
           allow="clipboard-read; clipboard-write; microphone *; camera *; midi *; geolocation *; encrypted-media *; display-capture *"
           onload="this.parentNode.querySelector('#loading-spinner').style.display='none';"
           onloadstart="this.parentNode.querySelector('#loading-spinner').style.display='block';"
@@ -149,15 +153,22 @@ export default class MentorAI extends HTMLElement {
           const left = (window.screen.width - width) / 2;
           const top = (window.screen.height - height) / 2;
 
+          const popupName = `MentorAI_${Date.now()}`;
           const popup = window.open(
             url,
-            "MentorAI",
+            popupName,
             `width=${width},height=${height},left=${left},top=${top},toolbar=no,location=no,directories=no,status=no,menubar=no,resizable=yes,scrollbars=yes`
           );
 
           // Ensure the popup is focused and on top
           if (popup) {
+            console.log(
+              "############################## pop up name ",
+              popupName
+            );
+            localStorage.setItem(POPUP_STORAGE_KEY, popupName);
             popup.focus();
+            this.popupWindow = popup;
           }
         }
       }
@@ -629,6 +640,47 @@ export default class MentorAI extends HTMLElement {
         pageContent: bodyContent,
       };
       iframe.contentWindow.postMessage(payload, "*");
+    }
+    // Also send to popup if available
+    this.sendHostInfoToPopup();
+  }
+
+  getPopupWindow(): Window | null {
+    // Check if we have a valid popup reference in memory
+    if (this.popupWindow && !this.popupWindow.closed) {
+      return this.popupWindow;
+    }
+    // Try to get popup by name from localStorage
+    const popupWindowName = localStorage.getItem(POPUP_STORAGE_KEY);
+    if (popupWindowName) {
+      // Attempt to get reference to existing popup by opening with same name
+      const existingPopup = window.open("", popupWindowName);
+
+      if (existingPopup && !existingPopup.closed) {
+        this.popupWindow = existingPopup;
+        return existingPopup;
+      } else {
+        // Popup was closed or doesn't exist, clean up
+        localStorage.removeItem(POPUP_STORAGE_KEY);
+        this.popupWindow = null;
+      }
+    }
+    return null;
+  }
+
+  sendHostInfoToPopup() {
+    const popup = this.getPopupWindow();
+    if (popup) {
+      const bodyContent = this.getCleanBodyContent();
+      const payload = {
+        type: "MENTOR:CONTEXT_UPDATE",
+        hostInfo: {
+          title: document.title,
+          href: window.location.href,
+        },
+        pageContent: bodyContent,
+      };
+      popup.postMessage(payload, "*");
     }
   }
 

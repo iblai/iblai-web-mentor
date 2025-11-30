@@ -1,3 +1,7 @@
+[2.2.2]
+
+- feat: store popup reference in localStorage and send host context to popup
+
 [2.2.1]
 
 - feat: trigger chat action popup with user data in url
