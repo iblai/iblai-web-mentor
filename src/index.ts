@@ -162,10 +162,6 @@ export default class MentorAI extends HTMLElement {
 
           // Ensure the popup is focused and on top
           if (popup) {
-            console.log(
-              "############################## pop up name ",
-              popupName
-            );
             localStorage.setItem(POPUP_STORAGE_KEY, popupName);
             popup.focus();
             this.popupWindow = popup;
@@ -262,6 +258,17 @@ export default class MentorAI extends HTMLElement {
                 this.redirectToAuthSPA();
               }
             }
+          } else {
+            this.userObject = {
+              axd_token: message.auth.axd_token,
+              axd_token_expires: message.auth.axd_token_expires,
+              userData: message.auth.userData,
+              dm_token_expires: message.auth.dm_token_expires,
+              edx_jwt_token: message.auth.edx_jwt_token,
+              tenant: message.auth.tenant,
+              tenants: message.auth.tenants,
+              dm_token: message.auth.dm_token,
+            };
           }
         } catch (error) {
           console.error("Error parsing userData from auth:", error);
@@ -656,10 +663,19 @@ export default class MentorAI extends HTMLElement {
       // Attempt to get reference to existing popup by opening with same name
       const existingPopup = window.open("", popupWindowName);
 
-      if (existingPopup && !existingPopup.closed) {
+      // Check if we got an actual existing popup vs a new blank one
+      if (
+        existingPopup &&
+        !existingPopup.closed &&
+        existingPopup.location.href !== "about:blank"
+      ) {
         this.popupWindow = existingPopup;
         return existingPopup;
       } else {
+        // Close the blank popup we just accidentally opened
+        if (existingPopup && existingPopup.location.href === "about:blank") {
+          existingPopup.close();
+        }
         // Popup was closed or doesn't exist, clean up
         localStorage.removeItem(POPUP_STORAGE_KEY);
         this.popupWindow = null;
