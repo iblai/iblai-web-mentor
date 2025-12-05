@@ -1,3 +1,7 @@
+[2.2.3]
+
+- fix: update userobject variable when user in canvas matches user from iframed mentor
+
 [2.2.2]
 
 - feat: store popup reference in localStorage and send host context to popup
