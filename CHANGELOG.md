@@ -1,3 +1,7 @@
+[2.2.4]
+
+- chore: add div to show message asking the user to refresh the page when rely on host for auth and there is an error fetching user tenants
+
 [2.2.3]
 
 - fix: update userobject variable when user in canvas matches user from iframed mentor
