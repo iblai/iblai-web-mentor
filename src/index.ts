@@ -72,9 +72,43 @@ export default class MentorAI extends HTMLElement {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
+
+        #refresh-instruction {
+            display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            color: #333;
+            padding: 20px;
+            max-width: 300px;
+        }
+
+        #refresh-instruction p {
+            margin: 0 0 15px 0;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        #refresh-instruction button {
+            background-color: #6cafe1;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        #refresh-instruction button:hover {
+            background-color: #5a9fd4;
+        }
     </style>
     <div id="ibl-chat-widget-container">
         <div class="spinner" id="loading-spinner"></div>
+        <div id="refresh-instruction"></div>
         <iframe
           sandbox="allow-scripts allow-same-origin"
           allow="clipboard-read; clipboard-write; microphone *; camera *; midi *; geolocation *; encrypted-media *; display-capture *"
@@ -255,7 +289,11 @@ export default class MentorAI extends HTMLElement {
                   this.sendAuthDataToIframe(this.userObject);
                 }
               } catch (error) {
-                this.redirectToAuthSPA();
+                if (this.authRelyOnHost) {
+                  this.showRefreshInstruction();
+                } else {
+                  this.redirectToAuthSPA();
+                }
               }
             }
           } else {
@@ -705,6 +743,29 @@ export default class MentorAI extends HTMLElement {
       return window.self !== window.top;
     } catch (e) {
       return true;
+    }
+  }
+
+  showRefreshInstruction() {
+    const refreshDiv = this.shadowRoot?.querySelector(
+      "#refresh-instruction"
+    ) as HTMLElement;
+    const iframe = this.shadowRoot?.querySelector("iframe") as HTMLElement;
+    const spinner = this.shadowRoot?.querySelector(
+      "#loading-spinner"
+    ) as HTMLElement;
+
+    if (refreshDiv) {
+      refreshDiv.innerHTML = `
+        <p>Your session has expired. Please refresh the page to continue.</p>
+      `;
+      refreshDiv.style.display = "block";
+    }
+    if (iframe) {
+      iframe.style.display = "none";
+    }
+    if (spinner) {
+      spinner.style.display = "none";
     }
   }
 
