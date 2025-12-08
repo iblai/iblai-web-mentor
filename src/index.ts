@@ -246,7 +246,11 @@ export default class MentorAI extends HTMLElement {
           }
         } catch (error) {
           console.error("Error fetching user tenants or tokens:", error);
-          this.redirectToAuthSPA();
+          if (this.authRelyOnHost) {
+            this.showRefreshInstruction();
+          } else {
+            this.redirectToAuthSPA();
+          }
         }
       }
 
