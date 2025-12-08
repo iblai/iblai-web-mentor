@@ -1,3 +1,7 @@
+[2.2.5]
+
+- chore: more checks to ensure that if there is no way to take the user due to LMS session being lost, we'll tell the user to refresh
+
 [2.2.4]
 
 - chore: add div to show message asking the user to refresh the page when rely on host for auth and there is an error fetching user tenants
