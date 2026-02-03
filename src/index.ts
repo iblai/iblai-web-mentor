@@ -22,6 +22,8 @@ export default class MentorAI extends HTMLElement {
   private iframeContexts: { [key: string]: string } = {}; // Object to keep track of iframe contexts
   private userObject: any = null; // Store user object for popup windows
   private popupWindow: Window | null = null; // Reference to popup window
+  private sentOpenNewWindowForScreenShare: boolean = false; // Track if we sent ACTION:OPEN_NEW_WINDOW for screen sharing
+  private originalIframeDimensions: { width: string; height: string } | null = null; // Store original iframe dimensions
 
   constructor() {
     super();
@@ -105,10 +107,115 @@ export default class MentorAI extends HTMLElement {
         #refresh-instruction button:hover {
             background-color: #5a9fd4;
         }
+
+        #screensharing-overlay {
+            display: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            z-index: 100;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            color: white;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        #screensharing-overlay.active {
+            display: flex;
+        }
+
+        #screensharing-overlay .icon {
+            width: 80px;
+            height: 80px;
+            margin-bottom: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #screensharing-overlay .icon svg {
+            width: 40px;
+            height: 40px;
+            fill: white;
+        }
+
+        #screensharing-overlay h2 {
+            margin: 0 0 10px 0;
+            font-size: 24px;
+            font-weight: 600;
+        }
+
+        #screensharing-overlay p {
+            margin: 0 0 25px 0;
+            font-size: 14px;
+            opacity: 0.9;
+            line-height: 1.5;
+        }
+
+        #screensharing-overlay .pulse-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 25px;
+            font-size: 14px;
+        }
+
+        #screensharing-overlay .pulse-dot {
+            width: 12px;
+            height: 12px;
+            background-color: #4ade80;
+            border-radius: 50%;
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.2); }
+        }
+
+        #screensharing-overlay button {
+            background-color: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 2px solid white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        #screensharing-overlay button:hover {
+            background-color: white;
+            color: #764ba2;
+        }
     </style>
     <div id="ibl-chat-widget-container">
         <div class="spinner" id="loading-spinner"></div>
         <div id="refresh-instruction"></div>
+        <div id="screensharing-overlay">
+            <div class="icon">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                    <path d="M20 3H4c-1.1 0-2 .9-2 2v11c0 1.1.9 2 2 2h3l-1 1v2h12v-2l-1-1h3c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 13H4V5h16v11z"/>
+                </svg>
+            </div>
+            <h2>Screen Sharing Active</h2>
+            <div class="pulse-indicator">
+                <span class="pulse-dot"></span>
+                <span>Your screen is being shared</span>
+            </div>
+            <p>The mentor can now see your screen in the popup window.</p>
+            <button id="stop-screensharing-btn">Stop Screen Sharing</button>
+        </div>
         <iframe
           sandbox="allow-scripts allow-same-origin"
           allow="clipboard-read; clipboard-write; microphone *; camera *; midi *; geolocation *; encrypted-media *; display-capture *"
@@ -172,6 +279,10 @@ export default class MentorAI extends HTMLElement {
 
         // Check if running inside an iframe
         if (this.isInIframe()) {
+          // Track if this is a screen share request
+          if (message?.type === "MENTOR:CHAT_ACTION_SCREENSHARE") {
+            this.sentOpenNewWindowForScreenShare = true;
+          }
           // Send message to parent to open the window
           window.parent.postMessage(
             {
@@ -215,6 +326,21 @@ export default class MentorAI extends HTMLElement {
       ) as HTMLElement;
       if (container) {
         container.style.height = `${message.height}px`; // Set the height based on the message
+      }
+    }
+
+    // Handle screen sharing started message from parent
+    if (message?.type === "MENTOR:SCREENSHARING_STARTED") {
+      if (this.sentOpenNewWindowForScreenShare) {
+        this.showScreenSharingOverlay();
+      }
+    }
+
+    // Handle screen sharing stopped message from parent
+    if (message?.type === "MENTOR:SCREENSHARING_STOPPED") {
+      if (this.sentOpenNewWindowForScreenShare) {
+        this.hideScreenSharingOverlay();
+        this.sentOpenNewWindowForScreenShare = false;
       }
     }
 
@@ -392,6 +518,16 @@ export default class MentorAI extends HTMLElement {
           spinner.style.display = "none";
         }
       };
+    }
+
+    // Set up click handler for stop screen sharing button
+    const stopScreenSharingBtn = this.shadowRoot?.querySelector(
+      "#stop-screensharing-btn"
+    );
+    if (stopScreenSharingBtn) {
+      stopScreenSharingBtn.addEventListener("click", () => {
+        this.stopScreenSharing();
+      });
     }
   }
 
@@ -771,6 +907,59 @@ export default class MentorAI extends HTMLElement {
     if (spinner) {
       spinner.style.display = "none";
     }
+  }
+
+  showScreenSharingOverlay() {
+    const overlay = this.shadowRoot?.querySelector(
+      "#screensharing-overlay"
+    ) as HTMLElement;
+    const iframe = this.shadowRoot?.querySelector("iframe") as HTMLElement;
+
+    if (iframe) {
+      // Store original dimensions before hiding
+      this.originalIframeDimensions = {
+        width: iframe.style.width || "100%",
+        height: iframe.style.height || "100%",
+      };
+      // Hide iframe by setting dimensions to 0
+      iframe.style.width = "0";
+      iframe.style.height = "0";
+    }
+
+    if (overlay) {
+      overlay.classList.add("active");
+    }
+  }
+
+  hideScreenSharingOverlay() {
+    const overlay = this.shadowRoot?.querySelector(
+      "#screensharing-overlay"
+    ) as HTMLElement;
+    const iframe = this.shadowRoot?.querySelector("iframe") as HTMLElement;
+
+    if (overlay) {
+      overlay.classList.remove("active");
+    }
+
+    if (iframe && this.originalIframeDimensions) {
+      // Restore original dimensions
+      iframe.style.width = this.originalIframeDimensions.width;
+      iframe.style.height = this.originalIframeDimensions.height;
+      this.originalIframeDimensions = null;
+    }
+  }
+
+  stopScreenSharing() {
+    // Send message to parent to stop screen sharing
+    window.parent.postMessage(
+      {
+        type: "MENTOR:SCREENSHARING_STOPPED",
+      },
+      "*"
+    );
+    // Hide the overlay and restore iframe
+    this.hideScreenSharingOverlay();
+    this.sentOpenNewWindowForScreenShare = false;
   }
 
   getEdxJwtToken(): string | undefined {
