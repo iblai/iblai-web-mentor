@@ -1,3 +1,10 @@
+[2.3.0]
+
+- feat: add screen sharing overlay UI when MENTOR:SCREENSHARING_STARTED is received after sending ACTION:OPEN_NEW_WINDOW
+- feat: hide iframe and show overlay with "Screen Sharing Active" message and stop button
+- feat: send MENTOR:SCREENSHARING_STOPPED to parent when user clicks stop screen sharing
+- feat: restore iframe dimensions when MENTOR:SCREENSHARING_STOPPED is received from parent
+
 [2.2.5]
 
 - chore: more checks to ensure that if there is no way to take the user due to LMS session being lost, we'll tell the user to refresh
