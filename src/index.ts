@@ -13,6 +13,7 @@ export {
 } from "./context-share";
 
 const POPUP_STORAGE_KEY = "mentor-ai-popup-id";
+const SCREEN_SHARING_STORAGE_KEY = "mentor-ai-screen-sharing-active";
 
 export default class MentorAI extends HTMLElement {
   isEmbeddedMentorReady: boolean = false;
@@ -292,6 +293,10 @@ export default class MentorAI extends HTMLElement {
             "*"
           );
         } else {
+          // Track if this is a screen share request
+          if (message?.type === "MENTOR:CHAT_ACTION_SCREENSHARE") {
+            this.sentOpenNewWindowForScreenShare = true;
+          }
           // Mobile-size window dimensions
           const width = 375;
           const height = 667;
@@ -332,6 +337,7 @@ export default class MentorAI extends HTMLElement {
     // Handle screen sharing started message from parent
     if (message?.type === "MENTOR:SCREENSHARING_STARTED") {
       if (this.sentOpenNewWindowForScreenShare) {
+        localStorage.setItem(SCREEN_SHARING_STORAGE_KEY, "true");
         this.showScreenSharingOverlay();
       }
     }
@@ -341,6 +347,7 @@ export default class MentorAI extends HTMLElement {
       if (this.sentOpenNewWindowForScreenShare) {
         this.hideScreenSharingOverlay();
         this.sentOpenNewWindowForScreenShare = false;
+        localStorage.removeItem(SCREEN_SHARING_STORAGE_KEY);
       }
     }
 
@@ -528,6 +535,28 @@ export default class MentorAI extends HTMLElement {
       stopScreenSharingBtn.addEventListener("click", () => {
         this.stopScreenSharing();
       });
+    }
+
+    // Restore screen sharing overlay if it was active before page refresh
+    const screenSharingWasActive = localStorage.getItem(
+      SCREEN_SHARING_STORAGE_KEY
+    );
+    if (screenSharingWasActive) {
+      if (this.isInIframe()) {
+        // In iframe mode, the parent manages the popup — trust the persisted state
+        this.sentOpenNewWindowForScreenShare = true;
+        this.showScreenSharingOverlay();
+      } else {
+        // In standalone mode, verify the popup is still open
+        const popup = this.getPopupWindow();
+        if (popup) {
+          this.sentOpenNewWindowForScreenShare = true;
+          this.showScreenSharingOverlay();
+        } else {
+          // Popup was closed while we were away, clean up
+          localStorage.removeItem(SCREEN_SHARING_STORAGE_KEY);
+        }
+      }
     }
   }
 
@@ -950,16 +979,27 @@ export default class MentorAI extends HTMLElement {
   }
 
   stopScreenSharing() {
-    // Send message to parent to stop screen sharing
-    window.parent.postMessage(
-      {
-        type: "MENTOR:SCREENSHARING_STOPPED",
-      },
-      "*"
-    );
+    if (this.isInIframe()) {
+      // Send message to parent to stop screen sharing
+      window.parent.postMessage(
+        {
+          type: "MENTOR:SCREENSHARING_STOPPED",
+        },
+        "*"
+      );
+    } else {
+      // Close the popup window if still open
+      const popup = this.getPopupWindow();
+      if (popup && !popup.closed) {
+        popup.close();
+      }
+      localStorage.removeItem(POPUP_STORAGE_KEY);
+      this.popupWindow = null;
+    }
     // Hide the overlay and restore iframe
     this.hideScreenSharingOverlay();
     this.sentOpenNewWindowForScreenShare = false;
+    localStorage.removeItem(SCREEN_SHARING_STORAGE_KEY);
   }
 
   getEdxJwtToken(): string | undefined {
