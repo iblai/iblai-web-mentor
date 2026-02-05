@@ -1,3 +1,9 @@
+[2.3.1]
+
+- fix: close popup window when stopping screen sharing in standalone mode (non-iframe)
+- feat: persist screen sharing overlay state across page refreshes using localStorage
+- fix: set sentOpenNewWindowForScreenShare flag in non-iframe path for screen share requests
+
 [2.3.0]
 
 - feat: add screen sharing overlay UI when MENTOR:SCREENSHARING_STARTED is received after sending ACTION:OPEN_NEW_WINDOW
