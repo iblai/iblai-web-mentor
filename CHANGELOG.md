@@ -1,3 +1,7 @@
+[2.3.2]
+
+- fix: always close popup window and clean up references when stopping screen sharing (both iframe and standalone modes)
+
 [2.3.1]
 
 - fix: close popup window when stopping screen sharing in standalone mode (non-iframe)

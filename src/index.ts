@@ -987,15 +987,14 @@ export default class MentorAI extends HTMLElement {
         },
         "*"
       );
-    } else {
-      // Close the popup window if still open
-      const popup = this.getPopupWindow();
-      if (popup && !popup.closed) {
-        popup.close();
-      }
-      localStorage.removeItem(POPUP_STORAGE_KEY);
-      this.popupWindow = null;
     }
+    // Close the popup window if still open
+    const popup = this.getPopupWindow();
+    if (popup && !popup.closed) {
+      popup.close();
+    }
+    localStorage.removeItem(POPUP_STORAGE_KEY);
+    this.popupWindow = null;
     // Hide the overlay and restore iframe
     this.hideScreenSharingOverlay();
     this.sentOpenNewWindowForScreenShare = false;
