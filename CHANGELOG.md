@@ -1,3 +1,7 @@
+[2.3.4]
+
+- feat: add mute toggle button that sends MENTOR:SCREENSHARING_MUTE to parent (iframe) or popup window
+
 [2.3.3]
 
 - feat: add microphone status UI to screen sharing overlay showing mic on/muted/speaking states

@@ -286,13 +286,22 @@ export default class MentorAI extends HTMLElement {
             color: #3b82f6;
             font-size: 13px;
             font-weight: 500;
-            cursor: default;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        #screensharing-overlay .audio-status-btn:hover {
+            background: rgba(59, 130, 246, 0.2);
         }
 
         #screensharing-overlay .audio-status-btn.muted {
             border-color: #ef4444;
             background: rgba(239, 68, 68, 0.1);
             color: #ef4444;
+        }
+
+        #screensharing-overlay .audio-status-btn.muted:hover {
+            background: rgba(239, 68, 68, 0.2);
         }
 
         #screensharing-overlay .audio-status-btn svg {
@@ -668,6 +677,14 @@ export default class MentorAI extends HTMLElement {
     if (stopScreenSharingBtn) {
       stopScreenSharingBtn.addEventListener("click", () => {
         this.stopScreenSharing();
+      });
+    }
+
+    // Set up click handler for mute button
+    const audioStatusBtn = this.shadowRoot?.querySelector("#audio-status-btn");
+    if (audioStatusBtn) {
+      audioStatusBtn.addEventListener("click", () => {
+        this.toggleMute();
       });
     }
 
@@ -1206,6 +1223,21 @@ export default class MentorAI extends HTMLElement {
     this.hideScreenSharingOverlay();
     this.sentOpenNewWindowForScreenShare = false;
     localStorage.removeItem(SCREEN_SHARING_STORAGE_KEY);
+  }
+
+  toggleMute() {
+    const message = { type: "MENTOR:SCREENSHARING_MUTE" };
+
+    if (this.isInIframe()) {
+      // Send to parent window
+      window.parent.postMessage(message, "*");
+    } else {
+      // Send to popup window if it exists
+      const popup = this.getPopupWindow();
+      if (popup && !popup.closed) {
+        popup.postMessage(message, "*");
+      }
+    }
   }
 
   getEdxJwtToken(): string | undefined {
