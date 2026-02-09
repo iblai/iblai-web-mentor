@@ -25,6 +25,8 @@ export default class MentorAI extends HTMLElement {
   private popupWindow: Window | null = null; // Reference to popup window
   private sentOpenNewWindowForScreenShare: boolean = false; // Track if we sent ACTION:OPEN_NEW_WINDOW for screen sharing
   private originalIframeDimensions: { width: string; height: string } | null = null; // Store original iframe dimensions
+  private isMicMuted: boolean = false; // Track mic muted state during screen sharing
+  private isMicSpeaking: boolean = false; // Track speaking state during screen sharing
 
   constructor() {
     super();
@@ -199,6 +201,105 @@ export default class MentorAI extends HTMLElement {
             background-color: white;
             color: #764ba2;
         }
+
+        /* Mic Status UI */
+        #screensharing-overlay .mic-status-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            margin-top: 30px;
+            padding: 16px 24px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 12px;
+        }
+
+        #screensharing-overlay .mic-status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            min-width: 100px;
+        }
+
+        #screensharing-overlay .mic-status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background-color: #3b82f6;
+            flex-shrink: 0;
+        }
+
+        #screensharing-overlay .mic-status-dot.speaking {
+            background-color: #22c55e;
+            box-shadow: 0 0 12px 4px rgba(34, 197, 94, 0.6);
+            animation: speakingPulse 1s ease-in-out infinite;
+        }
+
+        #screensharing-overlay .mic-status-dot.muted {
+            background-color: #ef4444;
+        }
+
+        @keyframes speakingPulse {
+            0%, 100% { box-shadow: 0 0 12px 4px rgba(34, 197, 94, 0.6); }
+            50% { box-shadow: 0 0 20px 8px rgba(34, 197, 94, 0.4); }
+        }
+
+        #screensharing-overlay .mic-status-text {
+            font-size: 14px;
+            font-weight: 500;
+            color: white;
+        }
+
+        #screensharing-overlay .mic-icon-circle {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            border: 2px solid #6b7280;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: transparent;
+        }
+
+        #screensharing-overlay .mic-icon-circle.muted {
+            border-color: #ef4444;
+        }
+
+        #screensharing-overlay .mic-icon-circle svg {
+            width: 24px;
+            height: 24px;
+            fill: #3b82f6;
+        }
+
+        #screensharing-overlay .mic-icon-circle.muted svg {
+            fill: #ef4444;
+        }
+
+        #screensharing-overlay .audio-status-btn {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 16px;
+            border-radius: 20px;
+            border: 2px solid #3b82f6;
+            background: rgba(59, 130, 246, 0.1);
+            color: #3b82f6;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: default;
+        }
+
+        #screensharing-overlay .audio-status-btn.muted {
+            border-color: #ef4444;
+            background: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+        }
+
+        #screensharing-overlay .audio-status-btn svg {
+            width: 16px;
+            height: 16px;
+            fill: currentColor;
+        }
     </style>
     <div id="ibl-chat-widget-container">
         <div class="spinner" id="loading-spinner"></div>
@@ -216,6 +317,29 @@ export default class MentorAI extends HTMLElement {
             </div>
             <p>The mentor can now see your screen in the popup window.</p>
             <button id="stop-screensharing-btn">Stop Screen Sharing</button>
+            <div class="mic-status-container" id="mic-status-container">
+                <div class="mic-status-indicator">
+                    <span class="mic-status-dot" id="mic-status-dot"></span>
+                    <span class="mic-status-text" id="mic-status-text">Mic on</span>
+                </div>
+                <div class="mic-icon-circle" id="mic-icon-circle">
+                    <svg id="mic-icon-on" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                        <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.91-3c-.49 0-.9.36-.98.85C16.52 14.2 14.47 16 12 16s-4.52-1.8-4.93-4.15c-.08-.49-.49-.85-.98-.85-.61 0-1.09.54-1 1.14.49 3 2.89 5.35 5.91 5.78V20c0 .55.45 1 1 1s1-.45 1-1v-2.08c3.02-.43 5.42-2.78 5.91-5.78.1-.6-.39-1.14-1-1.14z"/>
+                    </svg>
+                    <svg id="mic-icon-muted" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" style="display: none;">
+                        <path d="M19 11h-1.7c0 .74-.16 1.43-.43 2.05l1.23 1.23c.56-.98.9-2.09.9-3.28zm-4.02.17c0-.06.02-.11.02-.17V5c0-1.66-1.34-3-3-3S9 3.34 9 5v.18l5.98 5.99zM4.27 3L3 4.27l6.01 6.01V11c0 1.66 1.33 3 2.99 3 .22 0 .44-.03.65-.08l1.66 1.66c-.71.33-1.5.52-2.31.52-2.76 0-5.3-2.1-5.3-5.1H5c0 3.41 2.72 6.23 6 6.72V20c0 .55.45 1 1 1s1-.45 1-1v-2.28c.91-.13 1.77-.45 2.54-.9L19.73 21 21 19.73 4.27 3z"/>
+                    </svg>
+                </div>
+                <div class="audio-status-btn" id="audio-status-btn">
+                    <svg id="audio-btn-icon-on" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                        <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.91-3c-.49 0-.9.36-.98.85C16.52 14.2 14.47 16 12 16s-4.52-1.8-4.93-4.15c-.08-.49-.49-.85-.98-.85-.61 0-1.09.54-1 1.14.49 3 2.89 5.35 5.91 5.78V20c0 .55.45 1 1 1s1-.45 1-1v-2.08c3.02-.43 5.42-2.78 5.91-5.78.1-.6-.39-1.14-1-1.14z"/>
+                    </svg>
+                    <svg id="audio-btn-icon-muted" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" style="display: none;">
+                        <path d="M19 11h-1.7c0 .74-.16 1.43-.43 2.05l1.23 1.23c.56-.98.9-2.09.9-3.28zm-4.02.17c0-.06.02-.11.02-.17V5c0-1.66-1.34-3-3-3S9 3.34 9 5v.18l5.98 5.99zM4.27 3L3 4.27l6.01 6.01V11c0 1.66 1.33 3 2.99 3 .22 0 .44-.03.65-.08l1.66 1.66c-.71.33-1.5.52-2.31.52-2.76 0-5.3-2.1-5.3-5.1H5c0 3.41 2.72 6.23 6 6.72V20c0 .55.45 1 1 1s1-.45 1-1v-2.28c.91-.13 1.77-.45 2.54-.9L19.73 21 21 19.73 4.27 3z"/>
+                    </svg>
+                    <span id="audio-status-text">Audio on</span>
+                </div>
+            </div>
         </div>
         <iframe
           sandbox="allow-scripts allow-same-origin"
@@ -349,6 +473,16 @@ export default class MentorAI extends HTMLElement {
         this.sentOpenNewWindowForScreenShare = false;
         localStorage.removeItem(SCREEN_SHARING_STORAGE_KEY);
       }
+    }
+
+    // Handle screen sharing speaking state changes
+    if (message?.type === "MENTOR:SCREENSHARING_SPEAKING") {
+      this.updateMicSpeakingState(message.speaking);
+    }
+
+    // Handle screen sharing muted state changes
+    if (message?.type === "MENTOR:SCREENSHARING_MUTED") {
+      this.updateMicMutedState(message.muted);
     }
 
     if (!this.isAnonymous) {
@@ -975,6 +1109,79 @@ export default class MentorAI extends HTMLElement {
       iframe.style.width = this.originalIframeDimensions.width;
       iframe.style.height = this.originalIframeDimensions.height;
       this.originalIframeDimensions = null;
+    }
+
+    // Reset mic status when hiding overlay
+    this.resetMicStatus();
+  }
+
+  resetMicStatus() {
+    this.isMicMuted = false;
+    this.isMicSpeaking = false;
+    this.updateMicStatusUI();
+  }
+
+  updateMicMutedState(muted: boolean) {
+    this.isMicMuted = muted;
+    if (muted) {
+      this.isMicSpeaking = false; // Can't be speaking if muted
+    }
+    this.updateMicStatusUI();
+  }
+
+  updateMicSpeakingState(speaking: boolean) {
+    if (!this.isMicMuted) {
+      this.isMicSpeaking = speaking;
+      this.updateMicStatusUI();
+    }
+  }
+
+  updateMicStatusUI() {
+    const dot = this.shadowRoot?.querySelector("#mic-status-dot") as HTMLElement;
+    const statusText = this.shadowRoot?.querySelector("#mic-status-text") as HTMLElement;
+    const iconCircle = this.shadowRoot?.querySelector("#mic-icon-circle") as HTMLElement;
+    const micIconOn = this.shadowRoot?.querySelector("#mic-icon-on") as HTMLElement;
+    const micIconMuted = this.shadowRoot?.querySelector("#mic-icon-muted") as HTMLElement;
+    const audioBtn = this.shadowRoot?.querySelector("#audio-status-btn") as HTMLElement;
+    const audioBtnIconOn = this.shadowRoot?.querySelector("#audio-btn-icon-on") as HTMLElement;
+    const audioBtnIconMuted = this.shadowRoot?.querySelector("#audio-btn-icon-muted") as HTMLElement;
+    const audioStatusText = this.shadowRoot?.querySelector("#audio-status-text") as HTMLElement;
+
+    if (!dot || !statusText || !iconCircle || !audioBtn || !audioStatusText) return;
+
+    // Reset classes
+    dot.classList.remove("muted", "speaking");
+    iconCircle.classList.remove("muted");
+    audioBtn.classList.remove("muted");
+
+    if (this.isMicMuted) {
+      // Muted state
+      dot.classList.add("muted");
+      iconCircle.classList.add("muted");
+      audioBtn.classList.add("muted");
+      statusText.textContent = "Muted";
+      audioStatusText.textContent = "Muted";
+      if (micIconOn) micIconOn.style.display = "none";
+      if (micIconMuted) micIconMuted.style.display = "block";
+      if (audioBtnIconOn) audioBtnIconOn.style.display = "none";
+      if (audioBtnIconMuted) audioBtnIconMuted.style.display = "block";
+    } else if (this.isMicSpeaking) {
+      // Speaking state
+      dot.classList.add("speaking");
+      statusText.textContent = "Speaking";
+      audioStatusText.textContent = "Audio on";
+      if (micIconOn) micIconOn.style.display = "block";
+      if (micIconMuted) micIconMuted.style.display = "none";
+      if (audioBtnIconOn) audioBtnIconOn.style.display = "block";
+      if (audioBtnIconMuted) audioBtnIconMuted.style.display = "none";
+    } else {
+      // Mic on (default)
+      statusText.textContent = "Mic on";
+      audioStatusText.textContent = "Audio on";
+      if (micIconOn) micIconOn.style.display = "block";
+      if (micIconMuted) micIconMuted.style.display = "none";
+      if (audioBtnIconOn) audioBtnIconOn.style.display = "block";
+      if (audioBtnIconMuted) audioBtnIconMuted.style.display = "none";
     }
   }
 

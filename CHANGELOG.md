@@ -1,3 +1,9 @@
+[2.3.3]
+
+- feat: add microphone status UI to screen sharing overlay showing mic on/muted/speaking states
+- feat: handle MENTOR:SCREENSHARING_SPEAKING and MENTOR:SCREENSHARING_MUTED post messages
+- feat: visual indicators with colored dots (blue=on, red=muted, green=speaking) and audio status button
+
 [2.3.2]
 
 - fix: always close popup window and clean up references when stopping screen sharing (both iframe and standalone modes)
