@@ -1,3 +1,12 @@
+[2.3.6]
+
+- fix: verify popup exists before showing overlay on refresh (both iframe and standalone modes)
+
+[2.3.5]
+
+- feat: handle MENTOR:FOCUS_PARENT message to focus parent window
+- feat: optimistic UI toggle when mute button is clicked
+
 [2.3.4]
 
 - feat: add mute toggle button that sends MENTOR:SCREENSHARING_MUTE to parent (iframe) or popup window
