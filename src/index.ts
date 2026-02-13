@@ -698,20 +698,14 @@ export default class MentorAI extends HTMLElement {
       SCREEN_SHARING_STORAGE_KEY
     );
     if (screenSharingWasActive) {
-      if (this.isInIframe()) {
-        // In iframe mode, the parent manages the popup — trust the persisted state
+      // Verify the popup is still open before showing overlay
+      const popup = this.getPopupWindow();
+      if (popup) {
         this.sentOpenNewWindowForScreenShare = true;
         this.showScreenSharingOverlay();
       } else {
-        // In standalone mode, verify the popup is still open
-        const popup = this.getPopupWindow();
-        if (popup) {
-          this.sentOpenNewWindowForScreenShare = true;
-          this.showScreenSharingOverlay();
-        } else {
-          // Popup was closed while we were away, clean up
-          localStorage.removeItem(SCREEN_SHARING_STORAGE_KEY);
-        }
+        // Popup was closed while we were away, clean up
+        localStorage.removeItem(SCREEN_SHARING_STORAGE_KEY);
       }
     }
   }
