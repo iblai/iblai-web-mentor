@@ -494,6 +494,11 @@ export default class MentorAI extends HTMLElement {
       this.updateMicMutedState(message.muted);
     }
 
+    // Handle focus parent request
+    if (message?.type === "MENTOR:FOCUS_PARENT") {
+      window.focus();
+    }
+
     if (!this.isAnonymous) {
       if (message?.authExpired) {
         try {
@@ -1226,6 +1231,9 @@ export default class MentorAI extends HTMLElement {
   }
 
   toggleMute() {
+    // Optimistically toggle the mute state immediately for responsive UI
+    this.updateMicMutedState(!this.isMicMuted);
+
     const message = { type: "MENTOR:SCREENSHARING_MUTE" };
 
     if (this.isInIframe()) {
