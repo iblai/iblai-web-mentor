@@ -1,6 +1,10 @@
-[2.3.6]
+[2.4.0]
 
-- fix: verify popup exists before showing overlay on refresh (both iframe and standalone modes)
+- feat: two-row audio status UI with separate mentor and mic indicators
+- feat: handle MENTOR:SCREENSHARING_MENTOR_SPEAKING and MENTOR:SCREENSHARING_MENTOR_MUTED messages
+- feat: send MENTOR:SCREENSHARING_MENTOR_MUTE when mentor audio button is clicked
+- feat: request MENTOR:SCREENSHARING_STATUS from parent on refresh in iframe mode
+- fix: verify popup exists before showing overlay on refresh
 
 [2.3.5]
 

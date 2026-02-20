@@ -27,6 +27,8 @@ export default class MentorAI extends HTMLElement {
   private originalIframeDimensions: { width: string; height: string } | null = null; // Store original iframe dimensions
   private isMicMuted: boolean = false; // Track mic muted state during screen sharing
   private isMicSpeaking: boolean = false; // Track speaking state during screen sharing
+  private isMentorMuted: boolean = false; // Track mentor audio muted state
+  private isMentorSpeaking: boolean = false; // Track mentor speaking state
 
   constructor() {
     super();
@@ -202,26 +204,32 @@ export default class MentorAI extends HTMLElement {
             color: #764ba2;
         }
 
-        /* Mic Status UI */
-        #screensharing-overlay .mic-status-container {
+        /* Audio Status UI */
+        #screensharing-overlay .audio-status-container {
             display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 16px;
+            flex-direction: column;
+            gap: 12px;
             margin-top: 30px;
             padding: 16px 24px;
             background: rgba(0, 0, 0, 0.3);
             border-radius: 12px;
+            min-width: 260px;
         }
 
-        #screensharing-overlay .mic-status-indicator {
+        #screensharing-overlay .status-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+        }
+
+        #screensharing-overlay .status-indicator {
             display: flex;
             align-items: center;
             gap: 8px;
-            min-width: 100px;
         }
 
-        #screensharing-overlay .mic-status-dot {
+        #screensharing-overlay .status-dot {
             width: 10px;
             height: 10px;
             border-radius: 50%;
@@ -229,13 +237,13 @@ export default class MentorAI extends HTMLElement {
             flex-shrink: 0;
         }
 
-        #screensharing-overlay .mic-status-dot.speaking {
+        #screensharing-overlay .status-dot.speaking {
             background-color: #22c55e;
             box-shadow: 0 0 12px 4px rgba(34, 197, 94, 0.6);
             animation: speakingPulse 1s ease-in-out infinite;
         }
 
-        #screensharing-overlay .mic-status-dot.muted {
+        #screensharing-overlay .status-dot.muted {
             background-color: #ef4444;
         }
 
@@ -244,70 +252,46 @@ export default class MentorAI extends HTMLElement {
             50% { box-shadow: 0 0 20px 8px rgba(34, 197, 94, 0.4); }
         }
 
-        #screensharing-overlay .mic-status-text {
+        #screensharing-overlay .status-text {
             font-size: 14px;
             font-weight: 500;
             color: white;
         }
 
-        #screensharing-overlay .mic-icon-circle {
-            width: 48px;
-            height: 48px;
+        #screensharing-overlay .status-text.speaking {
+            color: #4ade80;
+        }
+
+        #screensharing-overlay .audio-action-btn {
+            width: 40px;
+            height: 40px;
             border-radius: 50%;
-            border: 2px solid #6b7280;
+            background: rgba(255, 255, 255, 0.15);
+            border: none;
             display: flex;
             align-items: center;
             justify-content: center;
-            background: transparent;
-        }
-
-        #screensharing-overlay .mic-icon-circle.muted {
-            border-color: #ef4444;
-        }
-
-        #screensharing-overlay .mic-icon-circle svg {
-            width: 24px;
-            height: 24px;
-            fill: #3b82f6;
-        }
-
-        #screensharing-overlay .mic-icon-circle.muted svg {
-            fill: #ef4444;
-        }
-
-        #screensharing-overlay .audio-status-btn {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            padding: 8px 16px;
-            border-radius: 20px;
-            border: 2px solid #3b82f6;
-            background: rgba(59, 130, 246, 0.1);
-            color: #3b82f6;
-            font-size: 13px;
-            font-weight: 500;
             cursor: pointer;
             transition: all 0.2s ease;
+            flex-shrink: 0;
         }
 
-        #screensharing-overlay .audio-status-btn:hover {
-            background: rgba(59, 130, 246, 0.2);
+        #screensharing-overlay .audio-action-btn:hover {
+            background: rgba(255, 255, 255, 0.25);
         }
 
-        #screensharing-overlay .audio-status-btn.muted {
-            border-color: #ef4444;
-            background: rgba(239, 68, 68, 0.1);
-            color: #ef4444;
-        }
-
-        #screensharing-overlay .audio-status-btn.muted:hover {
+        #screensharing-overlay .audio-action-btn.muted {
             background: rgba(239, 68, 68, 0.2);
         }
 
-        #screensharing-overlay .audio-status-btn svg {
-            width: 16px;
-            height: 16px;
-            fill: currentColor;
+        #screensharing-overlay .audio-action-btn svg {
+            width: 20px;
+            height: 20px;
+            fill: rgba(255, 255, 255, 0.8);
+        }
+
+        #screensharing-overlay .audio-action-btn.muted svg {
+            fill: #ef4444;
         }
     </style>
     <div id="ibl-chat-widget-container">
@@ -326,27 +310,34 @@ export default class MentorAI extends HTMLElement {
             </div>
             <p>The mentor can now see your screen in the popup window.</p>
             <button id="stop-screensharing-btn">Stop Screen Sharing</button>
-            <div class="mic-status-container" id="mic-status-container">
-                <div class="mic-status-indicator">
-                    <span class="mic-status-dot" id="mic-status-dot"></span>
-                    <span class="mic-status-text" id="mic-status-text">Mic on</span>
+            <div class="audio-status-container" id="audio-status-container">
+                <div class="status-row">
+                    <div class="status-indicator">
+                        <span class="status-dot" id="mentor-status-dot"></span>
+                        <span class="status-text" id="mentor-status-text">Mentor audio on</span>
+                    </div>
+                    <div class="audio-action-btn" id="mentor-audio-btn">
+                        <svg id="mentor-icon-on" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                            <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>
+                        </svg>
+                        <svg id="mentor-icon-muted" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" style="display: none;">
+                            <path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"/>
+                        </svg>
+                    </div>
                 </div>
-                <div class="mic-icon-circle" id="mic-icon-circle">
-                    <svg id="mic-icon-on" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-                        <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.91-3c-.49 0-.9.36-.98.85C16.52 14.2 14.47 16 12 16s-4.52-1.8-4.93-4.15c-.08-.49-.49-.85-.98-.85-.61 0-1.09.54-1 1.14.49 3 2.89 5.35 5.91 5.78V20c0 .55.45 1 1 1s1-.45 1-1v-2.08c3.02-.43 5.42-2.78 5.91-5.78.1-.6-.39-1.14-1-1.14z"/>
-                    </svg>
-                    <svg id="mic-icon-muted" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" style="display: none;">
-                        <path d="M19 11h-1.7c0 .74-.16 1.43-.43 2.05l1.23 1.23c.56-.98.9-2.09.9-3.28zm-4.02.17c0-.06.02-.11.02-.17V5c0-1.66-1.34-3-3-3S9 3.34 9 5v.18l5.98 5.99zM4.27 3L3 4.27l6.01 6.01V11c0 1.66 1.33 3 2.99 3 .22 0 .44-.03.65-.08l1.66 1.66c-.71.33-1.5.52-2.31.52-2.76 0-5.3-2.1-5.3-5.1H5c0 3.41 2.72 6.23 6 6.72V20c0 .55.45 1 1 1s1-.45 1-1v-2.28c.91-.13 1.77-.45 2.54-.9L19.73 21 21 19.73 4.27 3z"/>
-                    </svg>
-                </div>
-                <div class="audio-status-btn" id="audio-status-btn">
-                    <svg id="audio-btn-icon-on" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-                        <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.91-3c-.49 0-.9.36-.98.85C16.52 14.2 14.47 16 12 16s-4.52-1.8-4.93-4.15c-.08-.49-.49-.85-.98-.85-.61 0-1.09.54-1 1.14.49 3 2.89 5.35 5.91 5.78V20c0 .55.45 1 1 1s1-.45 1-1v-2.08c3.02-.43 5.42-2.78 5.91-5.78.1-.6-.39-1.14-1-1.14z"/>
-                    </svg>
-                    <svg id="audio-btn-icon-muted" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" style="display: none;">
-                        <path d="M19 11h-1.7c0 .74-.16 1.43-.43 2.05l1.23 1.23c.56-.98.9-2.09.9-3.28zm-4.02.17c0-.06.02-.11.02-.17V5c0-1.66-1.34-3-3-3S9 3.34 9 5v.18l5.98 5.99zM4.27 3L3 4.27l6.01 6.01V11c0 1.66 1.33 3 2.99 3 .22 0 .44-.03.65-.08l1.66 1.66c-.71.33-1.5.52-2.31.52-2.76 0-5.3-2.1-5.3-5.1H5c0 3.41 2.72 6.23 6 6.72V20c0 .55.45 1 1 1s1-.45 1-1v-2.28c.91-.13 1.77-.45 2.54-.9L19.73 21 21 19.73 4.27 3z"/>
-                    </svg>
-                    <span id="audio-status-text">Audio on</span>
+                <div class="status-row">
+                    <div class="status-indicator">
+                        <span class="status-dot" id="mic-status-dot"></span>
+                        <span class="status-text" id="mic-status-text">Mic on</span>
+                    </div>
+                    <div class="audio-action-btn" id="mic-audio-btn">
+                        <svg id="mic-icon-on" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                            <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.91-3c-.49 0-.9.36-.98.85C16.52 14.2 14.47 16 12 16s-4.52-1.8-4.93-4.15c-.08-.49-.49-.85-.98-.85-.61 0-1.09.54-1 1.14.49 3 2.89 5.35 5.91 5.78V20c0 .55.45 1 1 1s1-.45 1-1v-2.08c3.02-.43 5.42-2.78 5.91-5.78.1-.6-.39-1.14-1-1.14z"/>
+                        </svg>
+                        <svg id="mic-icon-muted" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" style="display: none;">
+                            <path d="M19 11h-1.7c0 .74-.16 1.43-.43 2.05l1.23 1.23c.56-.98.9-2.09.9-3.28zm-4.02.17c0-.06.02-.11.02-.17V5c0-1.66-1.34-3-3-3S9 3.34 9 5v.18l5.98 5.99zM4.27 3L3 4.27l6.01 6.01V11c0 1.66 1.33 3 2.99 3 .22 0 .44-.03.65-.08l1.66 1.66c-.71.33-1.5.52-2.31.52-2.76 0-5.3-2.1-5.3-5.1H5c0 3.41 2.72 6.23 6 6.72V20c0 .55.45 1 1 1s1-.45 1-1v-2.28c.91-.13 1.77-.45 2.54-.9L19.73 21 21 19.73 4.27 3z"/>
+                        </svg>
+                    </div>
                 </div>
             </div>
         </div>
@@ -492,6 +483,16 @@ export default class MentorAI extends HTMLElement {
     // Handle screen sharing muted state changes
     if (message?.type === "MENTOR:SCREENSHARING_MUTED") {
       this.updateMicMutedState(message.muted);
+    }
+
+    // Handle mentor speaking state changes
+    if (message?.type === "MENTOR:SCREENSHARING_MENTOR_SPEAKING") {
+      this.updateMentorSpeakingState(message.speaking);
+    }
+
+    // Handle mentor muted state changes
+    if (message?.type === "MENTOR:SCREENSHARING_MENTOR_MUTED") {
+      this.updateMentorMutedState(message.muted);
     }
 
     // Handle focus parent request
@@ -685,11 +686,19 @@ export default class MentorAI extends HTMLElement {
       });
     }
 
-    // Set up click handler for mute button
-    const audioStatusBtn = this.shadowRoot?.querySelector("#audio-status-btn");
-    if (audioStatusBtn) {
-      audioStatusBtn.addEventListener("click", () => {
+    // Set up click handler for mic mute button
+    const micAudioBtn = this.shadowRoot?.querySelector("#mic-audio-btn");
+    if (micAudioBtn) {
+      micAudioBtn.addEventListener("click", () => {
         this.toggleMute();
+      });
+    }
+
+    // Set up click handler for mentor mute button
+    const mentorAudioBtn = this.shadowRoot?.querySelector("#mentor-audio-btn");
+    if (mentorAudioBtn) {
+      mentorAudioBtn.addEventListener("click", () => {
+        this.toggleMentorMute();
       });
     }
 
@@ -698,14 +707,19 @@ export default class MentorAI extends HTMLElement {
       SCREEN_SHARING_STORAGE_KEY
     );
     if (screenSharingWasActive) {
-      // Verify the popup is still open before showing overlay
-      const popup = this.getPopupWindow();
-      if (popup) {
-        this.sentOpenNewWindowForScreenShare = true;
-        this.showScreenSharingOverlay();
+      if (!this.isInIframe()) {
+        // Verify the popup is still open before showing overlay
+        const popup = this.getPopupWindow();
+        if (popup) {
+          this.sentOpenNewWindowForScreenShare = true;
+          this.showScreenSharingOverlay();
+        } else {
+          // Popup was closed while we were away, clean up
+          localStorage.removeItem(SCREEN_SHARING_STORAGE_KEY);
+        }
       } else {
-        // Popup was closed while we were away, clean up
-        localStorage.removeItem(SCREEN_SHARING_STORAGE_KEY);
+        // In iframe mode, ask parent if screen sharing is still active
+        window.parent.postMessage({ type: "MENTOR:SCREENSHARING_STATUS" }, "*");
       }
     }
   }
@@ -1127,77 +1141,111 @@ export default class MentorAI extends HTMLElement {
       this.originalIframeDimensions = null;
     }
 
-    // Reset mic status when hiding overlay
-    this.resetMicStatus();
+    // Reset audio status when hiding overlay
+    this.resetAudioStatus();
   }
 
-  resetMicStatus() {
+  resetAudioStatus() {
     this.isMicMuted = false;
     this.isMicSpeaking = false;
-    this.updateMicStatusUI();
+    this.isMentorMuted = false;
+    this.isMentorSpeaking = false;
+    this.updateAudioStatusUI();
   }
 
   updateMicMutedState(muted: boolean) {
     this.isMicMuted = muted;
     if (muted) {
-      this.isMicSpeaking = false; // Can't be speaking if muted
+      this.isMicSpeaking = false;
     }
-    this.updateMicStatusUI();
+    this.updateAudioStatusUI();
   }
 
   updateMicSpeakingState(speaking: boolean) {
     if (!this.isMicMuted) {
       this.isMicSpeaking = speaking;
-      this.updateMicStatusUI();
+      this.updateAudioStatusUI();
     }
   }
 
-  updateMicStatusUI() {
-    const dot = this.shadowRoot?.querySelector("#mic-status-dot") as HTMLElement;
-    const statusText = this.shadowRoot?.querySelector("#mic-status-text") as HTMLElement;
-    const iconCircle = this.shadowRoot?.querySelector("#mic-icon-circle") as HTMLElement;
+  updateMentorMutedState(muted: boolean) {
+    this.isMentorMuted = muted;
+    if (muted) {
+      this.isMentorSpeaking = false;
+    }
+    this.updateAudioStatusUI();
+  }
+
+  updateMentorSpeakingState(speaking: boolean) {
+    if (!this.isMentorMuted) {
+      this.isMentorSpeaking = speaking;
+      this.updateAudioStatusUI();
+    }
+  }
+
+  updateAudioStatusUI() {
+    // Mentor row elements
+    const mentorDot = this.shadowRoot?.querySelector("#mentor-status-dot") as HTMLElement;
+    const mentorText = this.shadowRoot?.querySelector("#mentor-status-text") as HTMLElement;
+    const mentorBtn = this.shadowRoot?.querySelector("#mentor-audio-btn") as HTMLElement;
+    const mentorIconOn = this.shadowRoot?.querySelector("#mentor-icon-on") as HTMLElement;
+    const mentorIconMuted = this.shadowRoot?.querySelector("#mentor-icon-muted") as HTMLElement;
+
+    // Mic row elements
+    const micDot = this.shadowRoot?.querySelector("#mic-status-dot") as HTMLElement;
+    const micText = this.shadowRoot?.querySelector("#mic-status-text") as HTMLElement;
+    const micBtn = this.shadowRoot?.querySelector("#mic-audio-btn") as HTMLElement;
     const micIconOn = this.shadowRoot?.querySelector("#mic-icon-on") as HTMLElement;
     const micIconMuted = this.shadowRoot?.querySelector("#mic-icon-muted") as HTMLElement;
-    const audioBtn = this.shadowRoot?.querySelector("#audio-status-btn") as HTMLElement;
-    const audioBtnIconOn = this.shadowRoot?.querySelector("#audio-btn-icon-on") as HTMLElement;
-    const audioBtnIconMuted = this.shadowRoot?.querySelector("#audio-btn-icon-muted") as HTMLElement;
-    const audioStatusText = this.shadowRoot?.querySelector("#audio-status-text") as HTMLElement;
 
-    if (!dot || !statusText || !iconCircle || !audioBtn || !audioStatusText) return;
+    // Update mentor row
+    if (mentorDot && mentorText && mentorBtn) {
+      mentorDot.classList.remove("muted", "speaking");
+      mentorText.classList.remove("speaking");
+      mentorBtn.classList.remove("muted");
 
-    // Reset classes
-    dot.classList.remove("muted", "speaking");
-    iconCircle.classList.remove("muted");
-    audioBtn.classList.remove("muted");
+      if (this.isMentorMuted) {
+        mentorDot.classList.add("muted");
+        mentorBtn.classList.add("muted");
+        mentorText.textContent = "Mentor muted";
+        if (mentorIconOn) mentorIconOn.style.display = "none";
+        if (mentorIconMuted) mentorIconMuted.style.display = "block";
+      } else if (this.isMentorSpeaking) {
+        mentorDot.classList.add("speaking");
+        mentorText.classList.add("speaking");
+        mentorText.textContent = "Mentor speaking";
+        if (mentorIconOn) mentorIconOn.style.display = "block";
+        if (mentorIconMuted) mentorIconMuted.style.display = "none";
+      } else {
+        mentorText.textContent = "Mentor audio on";
+        if (mentorIconOn) mentorIconOn.style.display = "block";
+        if (mentorIconMuted) mentorIconMuted.style.display = "none";
+      }
+    }
 
-    if (this.isMicMuted) {
-      // Muted state
-      dot.classList.add("muted");
-      iconCircle.classList.add("muted");
-      audioBtn.classList.add("muted");
-      statusText.textContent = "Muted";
-      audioStatusText.textContent = "Muted";
-      if (micIconOn) micIconOn.style.display = "none";
-      if (micIconMuted) micIconMuted.style.display = "block";
-      if (audioBtnIconOn) audioBtnIconOn.style.display = "none";
-      if (audioBtnIconMuted) audioBtnIconMuted.style.display = "block";
-    } else if (this.isMicSpeaking) {
-      // Speaking state
-      dot.classList.add("speaking");
-      statusText.textContent = "Speaking";
-      audioStatusText.textContent = "Audio on";
-      if (micIconOn) micIconOn.style.display = "block";
-      if (micIconMuted) micIconMuted.style.display = "none";
-      if (audioBtnIconOn) audioBtnIconOn.style.display = "block";
-      if (audioBtnIconMuted) audioBtnIconMuted.style.display = "none";
-    } else {
-      // Mic on (default)
-      statusText.textContent = "Mic on";
-      audioStatusText.textContent = "Audio on";
-      if (micIconOn) micIconOn.style.display = "block";
-      if (micIconMuted) micIconMuted.style.display = "none";
-      if (audioBtnIconOn) audioBtnIconOn.style.display = "block";
-      if (audioBtnIconMuted) audioBtnIconMuted.style.display = "none";
+    // Update mic row
+    if (micDot && micText && micBtn) {
+      micDot.classList.remove("muted", "speaking");
+      micText.classList.remove("speaking");
+      micBtn.classList.remove("muted");
+
+      if (this.isMicMuted) {
+        micDot.classList.add("muted");
+        micBtn.classList.add("muted");
+        micText.textContent = "Muted";
+        if (micIconOn) micIconOn.style.display = "none";
+        if (micIconMuted) micIconMuted.style.display = "block";
+      } else if (this.isMicSpeaking) {
+        micDot.classList.add("speaking");
+        micText.classList.add("speaking");
+        micText.textContent = "Speaking";
+        if (micIconOn) micIconOn.style.display = "block";
+        if (micIconMuted) micIconMuted.style.display = "none";
+      } else {
+        micText.textContent = "Mic on";
+        if (micIconOn) micIconOn.style.display = "block";
+        if (micIconMuted) micIconMuted.style.display = "none";
+      }
     }
   }
 
@@ -1228,13 +1276,29 @@ export default class MentorAI extends HTMLElement {
     // Optimistically toggle the mute state immediately for responsive UI
     this.updateMicMutedState(!this.isMicMuted);
 
-    const message = { type: "MENTOR:SCREENSHARING_MUTE" };
+    const message = { type: "MENTOR:SCREENSHARING_MUTED" };
 
     if (this.isInIframe()) {
       // Send to parent window
       window.parent.postMessage(message, "*");
     } else {
       // Send to popup window if it exists
+      const popup = this.getPopupWindow();
+      if (popup && !popup.closed) {
+        popup.postMessage(message, "*");
+      }
+    }
+  }
+
+  toggleMentorMute() {
+    // Optimistically toggle the mentor mute state immediately for responsive UI
+    this.updateMentorMutedState(!this.isMentorMuted);
+
+    const message = { type: "MENTOR:SCREENSHARING_MENTOR_MUTED" };
+
+    if (this.isInIframe()) {
+      window.parent.postMessage(message, "*");
+    } else {
       const popup = this.getPopupWindow();
       if (popup && !popup.closed) {
         popup.postMessage(message, "*");
