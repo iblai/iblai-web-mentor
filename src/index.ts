@@ -460,7 +460,7 @@ export default class MentorAI extends HTMLElement {
 
     // Handle screen sharing started message from parent
     if (message?.type === "MENTOR:SCREENSHARING_STARTED") {
-      if (this.sentOpenNewWindowForScreenShare) {
+      if (this.sentOpenNewWindowForScreenShare || localStorage.getItem(SCREEN_SHARING_STORAGE_KEY) === "true") {
         localStorage.setItem(SCREEN_SHARING_STORAGE_KEY, "true");
         this.showScreenSharingOverlay();
       }
