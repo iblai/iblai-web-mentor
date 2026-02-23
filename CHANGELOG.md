@@ -1,3 +1,7 @@
+[2.4.1]
+
+- fix: check localStorage for screen sharing state on SCREENSHARING_STARTED to ensure overlay shows after page refresh
+
 [2.4.0]
 
 - feat: two-row audio status UI with separate mentor and mic indicators
