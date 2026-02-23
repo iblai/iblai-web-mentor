@@ -400,7 +400,7 @@ export default class MentorAI extends HTMLElement {
           iblDataParam = JSON.stringify(userObjectWithoutTenants);
         }
 
-        const url = `${iframe.src}&ibl-data=${iblDataParam}&chat-action=${chatAction}`;
+        const url = `${iframe.src}&ibl-data=${iblDataParam}&chat-action=${chatAction}&session-id=${message?.sessionId}`;
 
         // Check if running inside an iframe
         if (this.isInIframe()) {
@@ -1266,6 +1266,8 @@ export default class MentorAI extends HTMLElement {
     }
     localStorage.removeItem(POPUP_STORAGE_KEY);
     this.popupWindow = null;
+    // Notify the iframe that screen sharing has stopped
+    this.sendDataToIframe({ type: "MENTOR:SCREENSHARING_STOPPED" });
     // Hide the overlay and restore iframe
     this.hideScreenSharingOverlay();
     this.sentOpenNewWindowForScreenShare = false;
