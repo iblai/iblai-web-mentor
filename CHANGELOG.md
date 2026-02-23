@@ -1,3 +1,8 @@
+[2.4.2]
+
+- feat: send MENTOR:SCREENSHARING_STOPPED to iframe when screen sharing stops
+- feat: pass session-id parameter in popup window URL for screen sharing
+
 [2.4.1]
 
 - fix: check localStorage for screen sharing state on SCREENSHARING_STARTED to ensure overlay shows after page refresh
