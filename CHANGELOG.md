@@ -1,3 +1,7 @@
+[2.4.4]
+
+- refactor: remove unnecessary iframe dimension hiding during screen sharing since overlay covers it with z-index
+
 [2.4.3]
 
 - fix: set sentOpenNewWindowForScreenShare flag when restoring screen sharing overlay

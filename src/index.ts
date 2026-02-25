@@ -24,7 +24,6 @@ export default class MentorAI extends HTMLElement {
   private userObject: any = null; // Store user object for popup windows
   private popupWindow: Window | null = null; // Reference to popup window
   private sentOpenNewWindowForScreenShare: boolean = false; // Track if we sent ACTION:OPEN_NEW_WINDOW for screen sharing
-  private originalIframeDimensions: { width: string; height: string } | null = null; // Store original iframe dimensions
   private isMicMuted: boolean = false; // Track mic muted state during screen sharing
   private isMicSpeaking: boolean = false; // Track speaking state during screen sharing
   private isMentorMuted: boolean = false; // Track mentor audio muted state
@@ -1106,18 +1105,6 @@ export default class MentorAI extends HTMLElement {
     const overlay = this.shadowRoot?.querySelector(
       "#screensharing-overlay"
     ) as HTMLElement;
-    const iframe = this.shadowRoot?.querySelector("iframe") as HTMLElement;
-
-    if (iframe) {
-      // Store original dimensions before hiding
-      this.originalIframeDimensions = {
-        width: iframe.style.width || "100%",
-        height: iframe.style.height || "100%",
-      };
-      // Hide iframe by setting dimensions to 0
-      iframe.style.width = "0";
-      iframe.style.height = "0";
-    }
 
     if (overlay) {
       overlay.classList.add("active");
@@ -1129,17 +1116,9 @@ export default class MentorAI extends HTMLElement {
     const overlay = this.shadowRoot?.querySelector(
       "#screensharing-overlay"
     ) as HTMLElement;
-    const iframe = this.shadowRoot?.querySelector("iframe") as HTMLElement;
 
     if (overlay) {
       overlay.classList.remove("active");
-    }
-
-    if (iframe && this.originalIframeDimensions) {
-      // Restore original dimensions
-      iframe.style.width = this.originalIframeDimensions.width;
-      iframe.style.height = this.originalIframeDimensions.height;
-      this.originalIframeDimensions = null;
     }
 
     // Reset audio status when hiding overlay
