@@ -468,9 +468,7 @@ export default class MentorAI extends HTMLElement {
     // Handle screen sharing stopped message from parent
     if (message?.type === "MENTOR:SCREENSHARING_STOPPED") {
       if (this.sentOpenNewWindowForScreenShare) {
-        this.hideScreenSharingOverlay();
-        this.sentOpenNewWindowForScreenShare = false;
-        localStorage.removeItem(SCREEN_SHARING_STORAGE_KEY);
+        this.stopScreenSharing();
       }
     }
 
