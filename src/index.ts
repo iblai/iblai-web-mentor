@@ -1121,6 +1121,7 @@ export default class MentorAI extends HTMLElement {
 
     if (overlay) {
       overlay.classList.add("active");
+      this.sentOpenNewWindowForScreenShare = true;
     }
   }
 

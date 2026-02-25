@@ -1,3 +1,7 @@
+[2.4.3]
+
+- fix: set sentOpenNewWindowForScreenShare flag when restoring screen sharing overlay
+
 [2.4.2]
 
 - feat: send MENTOR:SCREENSHARING_STOPPED to iframe when screen sharing stops
