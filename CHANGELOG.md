@@ -1,3 +1,7 @@
+[2.4.5]
+
+- fix: push down screensharing stopped status to the mentor when signal comes from popped up mentor
+
 [2.4.4]
 
 - refactor: remove unnecessary iframe dimension hiding during screen sharing since overlay covers it with z-index
