@@ -15,7 +15,9 @@
       Qutoe of the day: Your future is built in the quiet hours when no one is
       watching. Keep showing up — the results will show up too.
     </p>
-    <mentor-ai
+
+    <!-- Default chat widget usage -->
+    <!-- <mentor-ai
       mentorurl="http://localhost:3001"
       authurl="http://localhost:3000"
       lmsurl="https://learn.iblai.org"
@@ -28,6 +30,21 @@
       iscontextaware
       enablechatactionpopup
       isanonymous
+    ></mentor-ai> -->
+
+    <!--
+      LMS Context Settings view usage (uncomment to test):
+      This renders a settings form instead of the chat iframe.
+      Used by instructors in external LMS systems (e.g. Canvas)
+      to configure whether the mentor widget is enabled for a
+      specific course/context.
+    -->
+    <mentor-ai
+      contextsettings
+      contextid="110"
+      lmsurl="https://learn.iblai.org"
+      tenant="sba"
+      mentor="744a3672-0a59-4cc9-ad5a-03ada402a658"
     ></mentor-ai>
   </body>
 </html>

@@ -17,6 +17,9 @@ export interface MentorAIProps extends HTMLElement {
   theme?: Theme;
   modal?: string;
   component: string;
+  contextSettings?: boolean;
+  contextId?: string;
+  contextEnabled?: boolean;
 }
 
 declare global {

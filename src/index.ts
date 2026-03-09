@@ -643,6 +643,11 @@ export default class MentorAI extends HTMLElement {
     }
   }
   connectedCallback() {
+    if (this.contextSettings) {
+      this.renderContextSettingsView();
+      return;
+    }
+
     if (this.iblData) {
       const url = new URL(window.location.href);
       url.searchParams.delete("ibl-data");
@@ -908,6 +913,38 @@ export default class MentorAI extends HTMLElement {
     this.setAttribute("documentfilter", value);
   }
 
+  get contextSettings() {
+    return this.hasAttribute("contextsettings");
+  }
+
+  set contextSettings(value) {
+    if (value) {
+      this.setAttribute("contextsettings", "");
+    } else {
+      this.removeAttribute("contextsettings");
+    }
+  }
+
+  get contextId(): string | null {
+    return this.getAttribute("contextid");
+  }
+
+  set contextId(value: string) {
+    this.setAttribute("contextid", value);
+  }
+
+  get contextEnabled() {
+    return this.hasAttribute("contextenabled");
+  }
+
+  set contextEnabled(value) {
+    if (value) {
+      this.setAttribute("contextenabled", "");
+    } else {
+      this.removeAttribute("contextenabled");
+    }
+  }
+
   static get observedAttributes() {
     return [
       "mentorUrl",
@@ -968,6 +1005,274 @@ export default class MentorAI extends HTMLElement {
     }
     if (name === "theme") {
       this.switchTheme(newValue);
+    }
+  }
+
+  private renderContextSettingsView() {
+    if (!this.shadowRoot) return;
+
+    const enabled = this.contextEnabled;
+
+    this.shadowRoot.innerHTML = `
+    <style>
+        :host {
+            display: block;
+            font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif;
+        }
+
+        .context-settings-container {
+            padding: 24px;
+            max-width: 600px;
+            color: #1a1a1a;
+        }
+
+        .context-settings-container h1 {
+            font-size: 1.875rem;
+            font-weight: 700;
+            color: #111827;
+            margin: 0 0 24px 0;
+            line-height: 1.2;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+
+        .checkbox-input {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 16px;
+            height: 16px;
+            border: 1px solid #1a1a1a;
+            border-radius: 3px;
+            cursor: pointer;
+            position: relative;
+            flex-shrink: 0;
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            transition: background-color 0.15s, border-color 0.15s;
+            margin: 0;
+            background-color: white;
+        }
+
+        .checkbox-input:checked {
+            background-color: #3B82F6;
+            border-color: #3B82F6;
+        }
+
+        .checkbox-input:checked::after {
+            content: '';
+            position: absolute;
+            left: 5px;
+            top: 1px;
+            width: 4px;
+            height: 8px;
+            border: solid white;
+            border-width: 0 2px 2px 0;
+            transform: rotate(45deg);
+        }
+
+        .checkbox-input:focus-visible {
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.3);
+        }
+
+        .checkbox-label {
+            font-size: 14px;
+            font-weight: 500;
+            color: #1a1a1a;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 14px;
+            font-weight: 500;
+            color: #646464;
+            margin-bottom: 8px;
+            line-height: 1;
+        }
+
+        .form-input {
+            display: flex;
+            width: 100%;
+            height: 36px;
+            padding: 4px 12px;
+            border: 1px solid #e8e8e8;
+            border-radius: 6px;
+            font-size: 14px;
+            font-family: inherit;
+            background: transparent;
+            color: #1a1a1a;
+            box-sizing: border-box;
+            transition: border-color 0.15s, box-shadow 0.15s;
+            outline: none;
+        }
+
+        .form-input:focus {
+            border-color: #b4b4b4;
+            box-shadow: 0 0 0 1px #b4b4b4;
+        }
+
+        .form-input::placeholder {
+            color: #8f8f8f;
+        }
+
+        .form-input:disabled {
+            cursor: not-allowed;
+            opacity: 0.5;
+        }
+
+        .save-button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            height: 36px;
+            padding: 8px 16px;
+            background: linear-gradient(to right, #2563EB, #93C5FD);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            font-family: inherit;
+            cursor: pointer;
+            transition: opacity 0.2s;
+            white-space: nowrap;
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+        }
+
+        .save-button:hover {
+            opacity: 0.9;
+        }
+
+        .save-button:disabled {
+            opacity: 0.5;
+            pointer-events: none;
+        }
+
+        .settings-message {
+            margin-top: 16px;
+            padding: 12px 16px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 400;
+        }
+
+        .settings-message.success {
+            background-color: #dcfce7;
+            color: #166534;
+        }
+
+        .settings-message.error {
+            background-color: #fef2f2;
+            color: #991b1b;
+        }
+    </style>
+    <div class="context-settings-container">
+        <h1 id="settings-heading"></h1>
+        <div class="checkbox-group">
+            <input type="checkbox" class="checkbox-input" id="context-enabled" ${enabled ? "checked" : ""} />
+            <label class="checkbox-label" for="context-enabled">Enabled</label>
+        </div>
+        <div class="form-group">
+            <label class="form-label" for="mentor-id-input">Mentor ID</label>
+            <input type="text" id="mentor-id-input" class="form-input" placeholder="Enter mentor UUID" />
+        </div>
+        <button id="save-settings-btn" class="save-button">Save</button>
+        <div id="settings-message" class="settings-message" style="display: none;"></div>
+    </div>
+    `;
+
+    // Set values safely via DOM manipulation
+    const heading = this.shadowRoot.querySelector("#settings-heading");
+    if (heading) {
+      heading.textContent = `Editing LMS Context Id: ${this.contextId || ""}`;
+    }
+
+    const mentorInput = this.shadowRoot.querySelector(
+      "#mentor-id-input"
+    ) as HTMLInputElement;
+    if (mentorInput) {
+      mentorInput.value = this.mentor || "";
+    }
+
+    const saveBtn = this.shadowRoot.querySelector("#save-settings-btn");
+    if (saveBtn) {
+      saveBtn.addEventListener("click", () => this.saveContextSettings());
+    }
+  }
+
+  private async saveContextSettings() {
+    const enabledCheckbox = this.shadowRoot?.querySelector(
+      "#context-enabled"
+    ) as HTMLInputElement;
+    const mentorIdInput = this.shadowRoot?.querySelector(
+      "#mentor-id-input"
+    ) as HTMLInputElement;
+    const saveBtn = this.shadowRoot?.querySelector(
+      "#save-settings-btn"
+    ) as HTMLButtonElement;
+    const messageDiv = this.shadowRoot?.querySelector(
+      "#settings-message"
+    ) as HTMLElement;
+
+    if (!enabledCheckbox || !mentorIdInput || !saveBtn || !messageDiv) return;
+
+    saveBtn.disabled = true;
+    saveBtn.textContent = "Saving...";
+    messageDiv.style.display = "none";
+
+    try {
+      const response = await fetch(
+        `${this.lmsUrl}/api/mentor-xblock/orgs/${this.tenant}/context/?context_id=${encodeURIComponent(
+          this.contextId || ""
+        )}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+          body: JSON.stringify({
+            enabled: enabledCheckbox.checked,
+            mentor_id: mentorIdInput.value,
+          }),
+        }
+      );
+
+      if (response.ok) {
+        messageDiv.textContent = "Settings saved successfully";
+        messageDiv.className = "settings-message success";
+        messageDiv.style.display = "block";
+      } else {
+        try {
+          const errorData = await response.json();
+          if (errorData.error) {
+            messageDiv.textContent = errorData.error;
+          } else {
+            messageDiv.textContent = "An unknown error occurred";
+          }
+        } catch {
+          messageDiv.textContent = "An unknown error occurred";
+        }
+        messageDiv.className = "settings-message error";
+        messageDiv.style.display = "block";
+      }
+    } catch {
+      messageDiv.textContent = "An unknown error occurred";
+      messageDiv.className = "settings-message error";
+      messageDiv.style.display = "block";
+    } finally {
+      saveBtn.disabled = false;
+      saveBtn.textContent = "Save";
     }
   }
 

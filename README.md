@@ -79,6 +79,104 @@ Include the component directly in your HTML:
 | component               | Specifies the component to display in the mentor application. Can be one of `analytics-overview`, `analytics-users`, `analytics-topics`, or `chat`. | String  | chat                     |
 | redirectToken           | A token used by the auth layer to redirect back to the equivalent set URL.                                                                          | String  | undefined                |
 | enablechatactionpopup   | Enables chat action popups for voice calls and screen sharing. When enabled, sends `MENTOR:ENABLE_CHAT_ACTION_POPUPS` message to the iframe.       | Boolean | false                    |
+| contextsettings         | Enables the LMS context settings view. When present, renders a settings form **instead of** the chat iframe.                                       | Boolean | false                    |
+| contextid               | The LMS context/course identifier. Displayed in the heading and sent with the settings API request. Used with `contextsettings`.                   | String  | undefined                |
+| contextenabled          | Sets the initial state of the Enabled checkbox in the context settings view. Present = checked, absent = unchecked. Used with `contextsettings`.   | Boolean | false                    |
+
+---
+
+## LMS Context Settings View
+
+When the `contextsettings` attribute is present, the component renders a settings form **instead of** the chat iframe. This view is designed for instructors in external LMS systems (e.g. Canvas, Open edX) who need to configure whether the mentor AI widget should be enabled or disabled for a specific course or context.
+
+### What the Settings Form Displays
+
+- A heading showing the Context ID (e.g. "Editing LMS Context Id: 110")
+- An **Enabled** checkbox to toggle whether the mentor widget is active for this context
+- A **Mentor ID** text input to specify which mentor to use
+- A **Save** button that submits the configuration via a POST request
+
+### How It Works
+
+1. The instructor sees a form pre-populated with the provided attribute values (enabled state, mentor ID).
+2. They can toggle the **Enabled** checkbox and/or change the **Mentor ID**.
+3. Clicking **Save** sends a POST request to:
+   ```
+   {lmsurl}/api/mentor-xblock/orgs/{tenant}/context/?context_id={contextid}
+   ```
+   with a JSON body:
+   ```json
+   {
+     "enabled": true,
+     "mentor_id": "744a3672-0a59-4cc9-ad5a-03ada402a658"
+   }
+   ```
+4. On success (HTTP 200), a green "Settings saved successfully" message is displayed.
+5. On error, the component displays the error message from the response payload (e.g. `{"error": "Mentor ID must be a valid UUID"}`), or a generic "An unknown error occurred" message if no specific error is returned.
+
+### Required Attributes for Context Settings
+
+| Attribute         | Required | Description                                                                 |
+| ----------------- | -------- | --------------------------------------------------------------------------- |
+| `contextsettings` | Yes      | Boolean flag that enables the context settings view.                        |
+| `contextid`       | Yes      | The LMS context/course identifier displayed in the heading.                 |
+| `lmsurl`          | Yes      | Base URL of the LMS, used to construct the API endpoint.                    |
+| `tenant`          | Yes      | Platform/organization key, used in the API endpoint path.                   |
+| `mentor`          | Yes      | The initial Mentor UUID pre-filled in the Mentor ID input field.            |
+| `contextenabled`  | No       | If present, the Enabled checkbox is initially checked. Otherwise unchecked. |
+
+### Context Settings Examples
+
+#### Enabled context with a pre-filled mentor
+
+```html
+<mentor-ai
+  contextsettings
+  contextid="110"
+  contextenabled
+  lmsurl="https://learn.iblai.app"
+  tenant="my-org"
+  mentor="744a3672-0a59-4cc9-ad5a-03ada402a658"
+></mentor-ai>
+```
+
+This renders the form with the Enabled checkbox **checked** and the Mentor ID field pre-filled with the provided UUID.
+
+#### Disabled context with no mentor
+
+```html
+<mentor-ai
+  contextsettings
+  contextid="205"
+  lmsurl="https://learn.iblai.app"
+  tenant="my-org"
+  mentor=""
+></mentor-ai>
+```
+
+This renders the form with the Enabled checkbox **unchecked** and an empty Mentor ID field.
+
+#### React usage
+
+```jsx
+import React from "react";
+import "@iblai/iblai-web-mentor";
+
+const CourseSettings = ({ contextId, mentorId, isEnabled }) => {
+  return (
+    <mentor-ai
+      contextsettings
+      contextid={contextId}
+      {...(isEnabled ? { contextenabled: "" } : {})}
+      lmsurl="https://learn.iblai.app"
+      tenant="my-org"
+      mentor={mentorId}
+    ></mentor-ai>
+  );
+};
+```
+
+---
 
 ## Javascript Frameworks
 
