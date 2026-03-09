@@ -1,3 +1,24 @@
+[2.4.5]
+
+- fix: push down screensharing stopped status to the mentor when signal comes from popped up mentor
+
+[2.4.4]
+
+- refactor: remove unnecessary iframe dimension hiding during screen sharing since overlay covers it with z-index
+
+[2.4.3]
+
+- fix: set sentOpenNewWindowForScreenShare flag when restoring screen sharing overlay
+
+[2.4.2]
+
+- feat: send MENTOR:SCREENSHARING_STOPPED to iframe when screen sharing stops
+- feat: pass session-id parameter in popup window URL for screen sharing
+
+[2.4.1]
+
+- fix: check localStorage for screen sharing state on SCREENSHARING_STARTED to ensure overlay shows after page refresh
+
 [2.4.0]
 
 - feat: two-row audio status UI with separate mentor and mic indicators

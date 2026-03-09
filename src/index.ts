@@ -24,7 +24,6 @@ export default class MentorAI extends HTMLElement {
   private userObject: any = null; // Store user object for popup windows
   private popupWindow: Window | null = null; // Reference to popup window
   private sentOpenNewWindowForScreenShare: boolean = false; // Track if we sent ACTION:OPEN_NEW_WINDOW for screen sharing
-  private originalIframeDimensions: { width: string; height: string } | null = null; // Store original iframe dimensions
   private isMicMuted: boolean = false; // Track mic muted state during screen sharing
   private isMicSpeaking: boolean = false; // Track speaking state during screen sharing
   private isMentorMuted: boolean = false; // Track mentor audio muted state
@@ -400,7 +399,7 @@ export default class MentorAI extends HTMLElement {
           iblDataParam = JSON.stringify(userObjectWithoutTenants);
         }
 
-        const url = `${iframe.src}&ibl-data=${iblDataParam}&chat-action=${chatAction}`;
+        const url = `${iframe.src}&ibl-data=${iblDataParam}&chat-action=${chatAction}&session-id=${message?.sessionId}`;
 
         // Check if running inside an iframe
         if (this.isInIframe()) {
@@ -460,7 +459,7 @@ export default class MentorAI extends HTMLElement {
 
     // Handle screen sharing started message from parent
     if (message?.type === "MENTOR:SCREENSHARING_STARTED") {
-      if (this.sentOpenNewWindowForScreenShare) {
+      if (this.sentOpenNewWindowForScreenShare || localStorage.getItem(SCREEN_SHARING_STORAGE_KEY) === "true") {
         localStorage.setItem(SCREEN_SHARING_STORAGE_KEY, "true");
         this.showScreenSharingOverlay();
       }
@@ -469,9 +468,7 @@ export default class MentorAI extends HTMLElement {
     // Handle screen sharing stopped message from parent
     if (message?.type === "MENTOR:SCREENSHARING_STOPPED") {
       if (this.sentOpenNewWindowForScreenShare) {
-        this.hideScreenSharingOverlay();
-        this.sentOpenNewWindowForScreenShare = false;
-        localStorage.removeItem(SCREEN_SHARING_STORAGE_KEY);
+        this.stopScreenSharing();
       }
     }
 
@@ -1411,21 +1408,10 @@ export default class MentorAI extends HTMLElement {
     const overlay = this.shadowRoot?.querySelector(
       "#screensharing-overlay"
     ) as HTMLElement;
-    const iframe = this.shadowRoot?.querySelector("iframe") as HTMLElement;
-
-    if (iframe) {
-      // Store original dimensions before hiding
-      this.originalIframeDimensions = {
-        width: iframe.style.width || "100%",
-        height: iframe.style.height || "100%",
-      };
-      // Hide iframe by setting dimensions to 0
-      iframe.style.width = "0";
-      iframe.style.height = "0";
-    }
 
     if (overlay) {
       overlay.classList.add("active");
+      this.sentOpenNewWindowForScreenShare = true;
     }
   }
 
@@ -1433,17 +1419,9 @@ export default class MentorAI extends HTMLElement {
     const overlay = this.shadowRoot?.querySelector(
       "#screensharing-overlay"
     ) as HTMLElement;
-    const iframe = this.shadowRoot?.querySelector("iframe") as HTMLElement;
 
     if (overlay) {
       overlay.classList.remove("active");
-    }
-
-    if (iframe && this.originalIframeDimensions) {
-      // Restore original dimensions
-      iframe.style.width = this.originalIframeDimensions.width;
-      iframe.style.height = this.originalIframeDimensions.height;
-      this.originalIframeDimensions = null;
     }
 
     // Reset audio status when hiding overlay
@@ -1571,6 +1549,8 @@ export default class MentorAI extends HTMLElement {
     }
     localStorage.removeItem(POPUP_STORAGE_KEY);
     this.popupWindow = null;
+    // Notify the iframe that screen sharing has stopped
+    this.sendDataToIframe({ type: "MENTOR:SCREENSHARING_STOPPED" });
     // Hide the overlay and restore iframe
     this.hideScreenSharingOverlay();
     this.sentOpenNewWindowForScreenShare = false;
