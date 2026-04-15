@@ -294,7 +294,9 @@ export default class MentorAI extends HTMLElement {
         }
     </style>
     <div id="ibl-chat-widget-container">
-        <div class="spinner" id="loading-spinner"></div>
+        <div class="spinner" id="loading-spinner" style="display: ${
+          this.hideInitialLoader ? "none" : "block"
+        };"></div>
         <div id="refresh-instruction"></div>
         <div id="screensharing-overlay">
             <div class="icon">
@@ -344,7 +346,9 @@ export default class MentorAI extends HTMLElement {
           sandbox="allow-scripts allow-same-origin"
           allow="clipboard-read; clipboard-write; microphone *; camera *; midi *; geolocation *; encrypted-media *; display-capture *"
           onload="this.parentNode.querySelector('#loading-spinner').style.display='none';"
-          onloadstart="this.parentNode.querySelector('#loading-spinner').style.display='block';"
+          onloadstart="this.parentNode.querySelector('#loading-spinner').style.display='${
+            this.hideInitialLoader ? "none" : "block"
+          }';"
         ></iframe>
     </div>
         `;
@@ -665,7 +669,7 @@ export default class MentorAI extends HTMLElement {
           "#loading-spinner"
         ) as HTMLElement;
         if (spinner) {
-          spinner.style.display = "block";
+          spinner.style.display = this.hideInitialLoader ? "none" : "block";
         }
       };
       iframe.onload = () => {
@@ -866,6 +870,18 @@ export default class MentorAI extends HTMLElement {
     }
   }
 
+  get hideInitialLoader() {
+    return this.hasAttribute("hideinitialloader");
+  }
+
+  set hideInitialLoader(value) {
+    if (value) {
+      this.setAttribute("hideinitialloader", "");
+    } else {
+      this.removeAttribute("hideinitialloader");
+    }
+  }
+
   get enableChatActionPopup() {
     return this.hasAttribute("enablechatactionpopup");
   }
@@ -949,6 +965,7 @@ export default class MentorAI extends HTMLElement {
       "mentor",
       "isadvanced",
       "iscontextaware",
+      "hideinitialloader",
       "enablechatactionpopup",
       "contextOrigins", // Add the new attribute to observed attributes
       "component",

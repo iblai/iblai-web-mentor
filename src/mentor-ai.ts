@@ -12,6 +12,7 @@ export interface MentorAIProps extends HTMLElement {
   isAnonymous?: boolean;
   isAdvanced?: boolean;
   isContextAware?: boolean;
+  hideInitialLoader?: boolean;
   redirectToken?: string;
   authRelyOnHost?: boolean;
   theme?: Theme;

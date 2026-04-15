@@ -1,3 +1,7 @@
+[2.5.1]
+
+- feat: allow initial loader be flagged behind hideInitialLoader prop
+
 [2.4.5]
 
 - fix: push down screensharing stopped status to the mentor when signal comes from popped up mentor
